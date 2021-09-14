@@ -379,7 +379,7 @@ func TestConfig_TemplateTopic(t *testing.T) {
 				Location:   tt.fields.Location,
 				MqttConfig: tt.fields.MqttConfig,
 			}
-			conf.formatTopic()
+			conf.FormatTopic()
 			if !reflect.DeepEqual(conf, tt.want) {
 				t.Fail()
 			}

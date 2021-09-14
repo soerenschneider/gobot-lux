@@ -18,7 +18,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could not build config: %v", err)
 	}
-	conf.templateTopic()
+	conf.FormatTopic()
 
 	if conf.MetricConfig != "" {
 		go internal.StartMetricsServer(conf.MetricConfig)

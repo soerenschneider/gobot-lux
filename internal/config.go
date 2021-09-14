@@ -193,7 +193,7 @@ func fromEnvBool(name string) (bool, error) {
 	return parsed, nil
 }
 
-func (conf *Config) formatTopic() {
+func (conf *Config) FormatTopic() {
 	if strings.Contains(conf.Topic, "%s") {
 		conf.Topic = fmt.Sprintf(conf.Topic, conf.Location)
 	}
