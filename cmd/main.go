@@ -12,11 +12,12 @@ import (
 )
 
 func main() {
+	log.Printf("Started %s, version %s, commit %s, built at %s", internal.BotName, internal.BuildVersion, internal.CommitHash, internal.BuildTime)
 	conf := getConfig()
 	conf.Print()
 	err := conf.Validate()
 	if err != nil {
-		log.Fatalf("Could not build config: %v", err)
+		log.Fatalf("Invalid config: %v", err)
 	}
 	conf.FormatTopic()
 
