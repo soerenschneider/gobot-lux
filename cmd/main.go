@@ -11,16 +11,10 @@ import (
 	"time"
 )
 
+
 func main() {
 	log.Printf("Started %s, version %s, commit %s, built at %s", internal.BotName, internal.BuildVersion, internal.CommitHash, internal.BuildTime)
 	conf := getConfig()
-	conf.Print()
-	err := conf.Validate()
-	if err != nil {
-		log.Fatalf("Invalid config: %v", err)
-	}
-	conf.FormatTopic()
-
 	if conf.MetricConfig != "" {
 		go internal.StartMetricsServer(conf.MetricConfig)
 	}
@@ -37,7 +31,7 @@ func main() {
 	}
 
 	bot := internal.AssembleBot(adaptors)
-	err = bot.Start()
+	err := bot.Start()
 	if err != nil {
 		log.Fatalf("could not start bot: %v", err)
 	}
@@ -60,5 +54,13 @@ func getConfig() internal.Config {
 	if nil == conf {
 		log.Fatalf("Received empty config, should not happen")
 	}
+
+	conf.Print()
+	err = conf.Validate()
+	if err != nil {
+		log.Fatalf("Invalid config: %v", err)
+	}
+	conf.FormatTopic()
+
 	return *conf
 }
