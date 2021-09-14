@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const BotName = "gobot_brightness"
+
 type BrightnessDriver interface {
 	Read() (val int, err error)
 	Name() string

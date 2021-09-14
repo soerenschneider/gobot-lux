@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"gobot-brightness/internal"
 	"gobot.io/x/gobot/drivers/aio"
 	"gobot.io/x/gobot/platforms/firmata"
@@ -17,6 +18,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could not build config: %v", err)
 	}
+	conf.templateTopic()
 
 	if conf.MetricConfig != "" {
 		go internal.StartMetricsServer(conf.MetricConfig)
@@ -24,7 +26,8 @@ func main() {
 
 	adaptor := firmata.NewAdaptor(conf.FirmAtaPort)
 	driver := aio.NewAnalogSensorDriver(adaptor, conf.AioPin, time.Millisecond*time.Duration(conf.AioPollingIntervalMs))
-	mqttAdaptor := mqtt.NewAdaptor(conf.MqttConfig.Host, conf.MqttConfig.ClientId)
+	clientId := fmt.Sprintf("%s_%s", internal.BotName, conf.Location)
+	mqttAdaptor := mqtt.NewAdaptor(conf.MqttConfig.Host, clientId)
 	adaptors := &internal.BrightnessBot{
 		Driver:      driver,
 		Adaptor:     adaptor,
