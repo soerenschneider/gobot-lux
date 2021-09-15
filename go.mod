@@ -1,4 +1,4 @@
-module gobot-brightness
+module gobot-lux
 
 go 1.16
 

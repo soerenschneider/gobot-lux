@@ -1,13 +1,14 @@
 package internal
 
 import (
+	"gobot-lux/internal/config"
 	"strconv"
 	"testing"
 	"time"
 )
 
 func TestAssembleBot(t *testing.T) {
-	conf := DefaultConfig()
+	conf := config.DefaultConfig()
 
 	sensorValue := 75
 

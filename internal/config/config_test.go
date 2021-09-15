@@ -1,4 +1,4 @@
-package internal
+package config
 
 import (
 	"fmt"
@@ -259,21 +259,17 @@ func TestReadJsonConfig(t *testing.T) {
 		},
 		{
 			name:     "example-config",
-			filePath: "../contrib/example-config.json",
+			filePath: "../../contrib/example-config-base.json",
 			want: &Config{
 				Location:     "loc",
-				MetricConfig: defaultMetricConfig,
-				SensorConfig: SensorConfig{
-					FirmAtaPort:          defaultFirmataPort,
-					AioPin:               defaultAioPin,
-					AioPollingIntervalMs: defaultAioPollingIntervalMs,
-				},
-				IntervalSecs: defaultIntervalSeconds,
-				LogValues:    defaultLogValues,
+				MetricConfig: ":1111",
+				IntervalSecs: 45,
+				LogValues:    true,
 				MqttConfig: MqttConfig{
 					Host:  "tcp://host:1883",
-					Topic: "sensors/%s/brightness",
+					Topic: "sensors/%s/sub",
 				},
+				SensorConfig: defaultSensorConfig(),
 			},
 			wantErr: false,
 		},

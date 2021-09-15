@@ -1,13 +1,12 @@
 package internal
 
 import (
+	"gobot-lux/internal/config"
 	"gobot.io/x/gobot"
 	"log"
 	"strconv"
 	"time"
 )
-
-const BotName = "gobot_brightness"
 
 type BrightnessDriver interface {
 	Read() (val int, err error)
@@ -30,7 +29,7 @@ type BrightnessBot struct {
 	Adaptor     gobot.Connection
 	MqttAdaptor MqttAdapter
 
-	Config Config
+	Config config.Config
 }
 
 func (m *BrightnessBot) publishMessage(msg []byte) {
@@ -69,7 +68,7 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 		adaptors = append(adaptors, bot.MqttAdaptor)
 	}
 
-	return gobot.NewRobot(BotName,
+	return gobot.NewRobot(config.BotName,
 		adaptors,
 		[]gobot.Device{bot.Driver},
 		work,

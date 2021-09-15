@@ -1,5 +1,5 @@
-BINARY_NAME = gobot-brightness
-MODULE = gobot-brightness
+BINARY_NAME = gobot-lux
+MODULE = gobot-lux
 
 build: version-info
 	go build -ldflags="-X '$(MODULE)/internal.BuildTime=${BUILD_TIME}' -X '$(MODULE)/internal.BuildVersion=${VERSION}' -X '$(MODULE)/internal.CommitHash=${COMMIT_HASH}'" -o $(BINARY_NAME) cmd/main.go

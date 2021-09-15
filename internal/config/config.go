@@ -1,4 +1,4 @@
-package internal
+package config
 
 import (
 	"encoding/json"
@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	BotName = "gobot_lux"
 	defaultLogValues       = false
 	defaultIntervalSeconds = 30
 	defaultMetricConfig    = ":9400"
@@ -29,7 +30,7 @@ type Config struct {
 	Location     string `json:"location,omitempty"`
 	MetricConfig string `json:"metrics_addr,omitempty"`
 	IntervalSecs int    `json:"interval_s,omitempty"`
-	LogValues    bool   `json:"log_values,omitempty"`
+	LogValues    bool   `json:"log_sensor,omitempty"`
 	MqttConfig
 	SensorConfig
 }

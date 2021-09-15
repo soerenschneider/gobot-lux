@@ -3,7 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gobot-brightness/internal"
+	"gobot-lux/internal"
+	"gobot-lux/internal/config"
 	"gobot.io/x/gobot/drivers/aio"
 	"gobot.io/x/gobot/platforms/firmata"
 	"gobot.io/x/gobot/platforms/mqtt"
@@ -11,9 +12,8 @@ import (
 	"time"
 )
 
-
 func main() {
-	log.Printf("Started %s, version %s, commit %s, built at %s", internal.BotName, internal.BuildVersion, internal.CommitHash, internal.BuildTime)
+	log.Printf("Started %s, version %s, commit %s, built at %s", config.BotName, internal.BuildVersion, internal.CommitHash, internal.BuildTime)
 	conf := getConfig()
 	if conf.MetricConfig != "" {
 		go internal.StartMetricsServer(conf.MetricConfig)
@@ -21,7 +21,7 @@ func main() {
 
 	adaptor := firmata.NewAdaptor(conf.FirmAtaPort)
 	driver := aio.NewAnalogSensorDriver(adaptor, conf.AioPin, time.Millisecond*time.Duration(conf.AioPollingIntervalMs))
-	clientId := fmt.Sprintf("%s_%s", internal.BotName, conf.Location)
+	clientId := fmt.Sprintf("%s_%s", config.BotName, conf.Location)
 	mqttAdaptor := mqtt.NewAdaptor(conf.MqttConfig.Host, clientId)
 	adaptors := &internal.BrightnessBot{
 		Driver:      driver,
@@ -37,17 +37,17 @@ func main() {
 	}
 }
 
-func getConfig() internal.Config {
+func getConfig() config.Config {
 	var configFile string
 	flag.StringVar(&configFile, "config", "", "File to read configuration from")
 	flag.Parse()
 	if configFile == "" {
 		log.Println("Building config from env vars")
-		return internal.ConfigFromEnv()
+		return config.ConfigFromEnv()
 	}
 
 	log.Printf("Reading config from file %s", configFile)
-	conf, err := internal.ReadJsonConfig(configFile)
+	conf, err := config.ReadJsonConfig(configFile)
 	if err != nil {
 		log.Fatalf("Could not read config from %s: %v", configFile, err)
 	}
