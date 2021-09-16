@@ -234,7 +234,7 @@ func TestConfig_Validate(t *testing.T) {
 					AioPollingIntervalMs: tt.fields.AioPollingIntervalMs,
 				},
 				IntervalSecs: tt.fields.IntervalSecs,
-				LogValues:    tt.fields.LogValues,
+				LogSensor:    tt.fields.LogValues,
 				MqttConfig:   tt.fields.MqttConfig,
 			}
 			if err := c.Validate(); (err != nil) != tt.wantErr {
@@ -264,7 +264,7 @@ func TestReadJsonConfig(t *testing.T) {
 				Location:     "loc",
 				MetricConfig: ":1111",
 				IntervalSecs: 45,
-				LogValues:    true,
+				LogSensor:    true,
 				MqttConfig: MqttConfig{
 					Host:  "tcp://host:1883",
 					Topic: "sensors/%s/sub",

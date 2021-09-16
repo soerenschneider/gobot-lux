@@ -13,7 +13,7 @@ import (
 
 const (
 	BotName                = "gobot_lux"
-	defaultLogValues       = false
+	defaultLogSensor       = false
 	defaultIntervalSeconds = 30
 	defaultMetricConfig    = ":9194"
 )
@@ -30,7 +30,7 @@ type Config struct {
 	Location     string `json:"location,omitempty"`
 	MetricConfig string `json:"metrics_addr,omitempty"`
 	IntervalSecs int    `json:"interval_s,omitempty"`
-	LogValues    bool   `json:"log_sensor,omitempty"`
+	LogSensor    bool   `json:"log_sensor,omitempty"`
 	MqttConfig
 	SensorConfig
 }
@@ -42,7 +42,7 @@ type MqttConfig struct {
 
 func DefaultConfig() Config {
 	return Config{
-		LogValues:    defaultLogValues,
+		LogSensor:    defaultLogSensor,
 		IntervalSecs: defaultIntervalSeconds,
 		MetricConfig: defaultMetricConfig,
 		SensorConfig: defaultSensorConfig(),
@@ -57,9 +57,9 @@ func ConfigFromEnv() Config {
 		conf.Location = location
 	}
 
-	logValues, err := fromEnvBool("LOG_VALUES")
+	logValues, err := fromEnvBool("LOG_SENSOR")
 	if err == nil {
-		conf.LogValues = logValues
+		conf.LogSensor = logValues
 	}
 
 	intervalSeconds, err := fromEnvInt("INTERVAL_S")
@@ -130,7 +130,7 @@ func (conf *Config) Print() {
 	log.Println("-----------------")
 	log.Println("Configuration:")
 	log.Printf("Location=%s", conf.Location)
-	log.Printf("LogValues=%t", conf.LogValues)
+	log.Printf("LogSensor=%t", conf.LogSensor)
 	log.Printf("MetricConfig=%s", conf.MetricConfig)
 	log.Printf("IntervalSecs=%d", conf.IntervalSecs)
 	log.Printf("Host=%s", conf.Host)

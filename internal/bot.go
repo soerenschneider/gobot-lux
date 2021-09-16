@@ -50,7 +50,7 @@ func readValueAndDispatch(bot *BrightnessBot) {
 		bot.MqttAdaptor.Publish(bot.Config.Topic, []byte(strconv.Itoa(readValue)))
 	}
 
-	if bot.Config.LogValues {
+	if bot.Config.LogSensor {
 		log.Printf("Read %d from sensor", readValue)
 	}
 }
