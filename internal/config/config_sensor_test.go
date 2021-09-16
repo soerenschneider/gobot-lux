@@ -14,7 +14,7 @@ func TestSensorConfig_Validate(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "empty",
+			name:    "empty",
 			wantErr: true,
 		},
 		{
@@ -27,8 +27,8 @@ func TestSensorConfig_Validate(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "missing pin",
-			fields:  fields{
+			name: "missing pin",
+			fields: fields{
 				FirmAtaPort:          "/dev/ttyUSB0",
 				AioPollingIntervalMs: 0,
 			},
@@ -37,8 +37,8 @@ func TestSensorConfig_Validate(t *testing.T) {
 		{
 			name: "missing polling",
 			fields: fields{
-				FirmAtaPort:          "/dev/ttyUSB0",
-				AioPin:               "5",
+				FirmAtaPort: "/dev/ttyUSB0",
+				AioPin:      "5",
 			},
 			wantErr: true,
 		},

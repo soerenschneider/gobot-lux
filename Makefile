@@ -17,5 +17,8 @@ coverage:
 	go tool cover -html=coverage.out -o=coverage.html
 	go tool cover -func=coverage.out -o=coverage.out
 
+fmt:
+	find . -iname "*.go" -exec go fmt {} \;
+
 unittest:
 	go test ./...

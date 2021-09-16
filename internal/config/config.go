@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	BotName = "gobot_lux"
+	BotName                = "gobot_lux"
 	defaultLogValues       = false
 	defaultIntervalSeconds = 30
 	defaultMetricConfig    = ":9194"
