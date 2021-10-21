@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.1.0...v1.2.0) (2021-10-21)
+
+
+### Features
+
+* add flag to print version info ([820f66d](https://www.github.com/soerenschneider/gobot-lux/commit/820f66d90871217a51f6c77ec4f32ca57e96bc44))
+* reproducible builds by omitting build time ([c6c60f9](https://www.github.com/soerenschneider/gobot-lux/commit/c6c60f9d22c7f677f8f10f4dcaaeb4e444c7d1ef))
+
+
+### Bug Fixes
+
+* use provided wrapper to send msg ([c7b241f](https://www.github.com/soerenschneider/gobot-lux/commit/c7b241f20cda5ff7f9aa4634d146265f577a0243))
+
 ## [1.1.0](https://www.github.com/soerenschneider/gobot-brightness/compare/v1.0.1...v1.1.0) (2021-09-14)
 
 
