@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gobot-lux/internal"
-	"gobot-lux/internal/config"
+	"github.com/soerenschneider/gobot-lux/internal"
+	"github.com/soerenschneider/gobot-lux/internal/config"
 	"gobot.io/x/gobot/drivers/aio"
 	"gobot.io/x/gobot/platforms/firmata"
 	"gobot.io/x/gobot/platforms/mqtt"

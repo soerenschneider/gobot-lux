@@ -1,4 +1,4 @@
-module gobot-lux
+module github.com/soerenschneider/gobot-lux
 
 go 1.16
 

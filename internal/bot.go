@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"gobot-lux/internal/config"
+	"github.com/soerenschneider/gobot-lux/internal/config"
 	"gobot.io/x/gobot"
 	"log"
 	"strconv"
