@@ -40,7 +40,7 @@ func (conf *SensorConfig) Validate() error {
 		return fmt.Errorf("polling interval must not be smaller than 5: %d", conf.AioPollingIntervalMs)
 	}
 
-	if conf.AioPollingIntervalMs > 500 {
+	if conf.AioPollingIntervalMs > 60 * 1000 {
 		return fmt.Errorf("polling interval too high: %d", conf.AioPollingIntervalMs)
 	}
 
