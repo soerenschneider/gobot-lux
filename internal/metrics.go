@@ -14,7 +14,7 @@ const namespace = config.BotName
 var (
 	metricBrightness = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "brightness_total",
+		Name:      "brightness_level",
 		Subsystem: "sensor",
 		Help:      "Current sensor reading of brightness level",
 	}, []string{"location"})
