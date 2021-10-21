@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.2.0...v1.3.0) (2021-10-21)
+
+
+### Features
+
+* Add version info metric ([9c0c23b](https://www.github.com/soerenschneider/gobot-lux/commit/9c0c23b0dd120e7cbb5eac81c40b9d7a42dd3514))
+
+
+### Bug Fixes
+
+* more reasonable limit for polling interval ([54652a0](https://www.github.com/soerenschneider/gobot-lux/commit/54652a01a066f0daf86ff56fb86ea2b3d5b3a289))
+* set auto-reconnect to true ([a8963a3](https://www.github.com/soerenschneider/gobot-lux/commit/a8963a39570f6f46b072b17bd6b64e2ea890f8dd))
+
 ## [1.2.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.1.0...v1.2.0) (2021-10-21)
 
 
