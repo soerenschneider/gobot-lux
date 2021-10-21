@@ -36,6 +36,8 @@ func main() {
 	driver := aio.NewAnalogSensorDriver(adaptor, conf.AioPin, time.Millisecond*time.Duration(conf.AioPollingIntervalMs))
 	clientId := fmt.Sprintf("%s_%s", config.BotName, conf.Location)
 	mqttAdaptor := mqtt.NewAdaptor(conf.MqttConfig.Host, clientId)
+	mqttAdaptor.SetAutoReconnect(true)
+	mqttAdaptor.SetQoS(1)
 	adaptors := &internal.BrightnessBot{
 		Driver:      driver,
 		Adaptor:     adaptor,
