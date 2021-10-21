@@ -12,6 +12,12 @@ import (
 const namespace = config.BotName
 
 var (
+	metricVersionInfo = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "version",
+		Help:      "Version information of this robot",
+	}, []string{"version", "commit"})
+
 	metricBrightness = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
 		Name:      "brightness_level",
