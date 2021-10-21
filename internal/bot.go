@@ -47,7 +47,7 @@ func readValueAndDispatch(bot *BrightnessBot) {
 		metricSensorError.WithLabelValues(bot.Config.Location).Inc()
 	} else {
 		metricBrightness.WithLabelValues(bot.Config.Location).Set(float64(readValue))
-		bot.MqttAdaptor.Publish(bot.Config.Topic, []byte(strconv.Itoa(readValue)))
+		bot.publishMessage([]byte(strconv.Itoa(readValue)))
 	}
 
 	if bot.Config.LogSensor {
