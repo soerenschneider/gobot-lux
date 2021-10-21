@@ -30,14 +30,14 @@ var (
 		Namespace: namespace,
 		Name:      "messages_published_total",
 		Subsystem: "mqtt",
-		Help:      "The assembleBot temperature in degrees Celsius",
+		Help:      "Total number of published messages via MQTT",
 	}, []string{"location"})
 
 	metricsMessagePublishErrors = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Name:      "message_publish_errors",
 		Subsystem: "mqtt",
-		Help:      "The assembleBot temperature in degrees Celsius",
+		Help:      "Total number of errors while trying to publish messages via MQTT",
 	}, []string{"location"})
 )
 
