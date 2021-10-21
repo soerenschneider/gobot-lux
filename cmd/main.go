@@ -9,12 +9,18 @@ import (
 	"gobot.io/x/gobot/platforms/firmata"
 	"gobot.io/x/gobot/platforms/mqtt"
 	"log"
+	"os"
 	"time"
 )
 
+const (
+	cliConfFile = "config"
+	cliVersion  = "version"
+)
+
 func main() {
-	log.Printf("Started %s, version %s, commit %s", config.BotName, internal.BuildVersion, internal.CommitHash)
 	conf := getConfig()
+	log.Printf("Started %s, version %s, commit %s", config.BotName, internal.BuildVersion, internal.CommitHash)
 	conf.FormatTopic()
 	conf.Print()
 	err := conf.Validate()
@@ -46,8 +52,15 @@ func main() {
 
 func getConfig() config.Config {
 	var configFile string
-	flag.StringVar(&configFile, "config", "", "File to read configuration from")
+	flag.StringVar(&configFile, cliConfFile, "", "File to read configuration from")
+	version := flag.Bool(cliVersion, false, "Print version and exit")
 	flag.Parse()
+
+	if *version {
+		fmt.Printf("%s (revision %s)", internal.BuildVersion, internal.CommitHash)
+		os.Exit(0)
+	}
+
 	if configFile == "" {
 		log.Println("Building config from env vars")
 		return config.ConfigFromEnv()
