@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.3.1](https://www.github.com/soerenschneider/gobot-lux/compare/v1.3.0...v1.3.1) (2021-11-02)
+
+
+### Miscellaneous Chores
+
+* Trigger release ([114216f](https://www.github.com/soerenschneider/gobot-lux/commit/114216fbcd9dfe916d9a8b0580b2d3bedce93e46))
+
 ## [1.3.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.2.0...v1.3.0) (2021-10-21)
 
 
