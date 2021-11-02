@@ -27,7 +27,7 @@ var (
 )
 
 type Config struct {
-	Location     string `json:"location,omitempty"`
+	Placement    string `json:"placement,omitempty"`
 	MetricConfig string `json:"metrics_addr,omitempty"`
 	IntervalSecs int    `json:"interval_s,omitempty"`
 	LogSensor    bool   `json:"log_sensor,omitempty"`
@@ -54,7 +54,7 @@ func ConfigFromEnv() Config {
 
 	location, err := fromEnv("LOCATION")
 	if err == nil {
-		conf.Location = location
+		conf.Placement = location
 	}
 
 	logValues, err := fromEnvBool("LOG_SENSOR")
@@ -99,7 +99,7 @@ func ReadJsonConfig(filePath string) (*Config, error) {
 }
 
 func (conf *Config) Validate() error {
-	if conf.Location == "" {
+	if conf.Placement == "" {
 		return errors.New("empty location provided")
 	}
 
@@ -129,7 +129,7 @@ func (conf *Config) Validate() error {
 func (conf *Config) Print() {
 	log.Println("-----------------")
 	log.Println("Configuration:")
-	log.Printf("Location=%s", conf.Location)
+	log.Printf("Placement=%s", conf.Placement)
 	log.Printf("LogSensor=%t", conf.LogSensor)
 	log.Printf("MetricConfig=%s", conf.MetricConfig)
 	log.Printf("IntervalSecs=%d", conf.IntervalSecs)
@@ -196,6 +196,6 @@ func fromEnvBool(name string) (bool, error) {
 
 func (conf *Config) FormatTopic() {
 	if strings.Contains(conf.Topic, "%s") {
-		conf.Topic = fmt.Sprintf(conf.Topic, conf.Location)
+		conf.Topic = fmt.Sprintf(conf.Topic, conf.Placement)
 	}
 }

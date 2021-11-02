@@ -35,18 +35,18 @@ type BrightnessBot struct {
 func (m *BrightnessBot) publishMessage(msg []byte) {
 	success := m.MqttAdaptor.Publish(m.Config.Topic, msg)
 	if success {
-		metricsMessagesPublished.WithLabelValues(m.Config.Location).Inc()
+		metricsMessagesPublished.WithLabelValues(m.Config.Placement).Inc()
 	} else {
-		metricsMessagePublishErrors.WithLabelValues(m.Config.Location).Inc()
+		metricsMessagePublishErrors.WithLabelValues(m.Config.Placement).Inc()
 	}
 }
 
 func readValueAndDispatch(bot *BrightnessBot) {
 	readValue, err := bot.Driver.Read()
 	if err != nil {
-		metricSensorError.WithLabelValues(bot.Config.Location).Inc()
+		metricSensorError.WithLabelValues(bot.Config.Placement).Inc()
 	} else {
-		metricBrightness.WithLabelValues(bot.Config.Location).Set(float64(readValue))
+		metricBrightness.WithLabelValues(bot.Config.Placement).Set(float64(readValue))
 		bot.publishMessage([]byte(strconv.Itoa(readValue)))
 	}
 

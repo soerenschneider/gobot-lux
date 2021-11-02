@@ -1,9 +1,8 @@
 {
-  "location": "loc",
+  "placement": "loc",
   "mqtt_host": "tcp://host:1883",
   "mqtt_topic": "sensors/%s/sub",
   "metrics_addr": ":1111",
   "log_sensor": true,
-  "interval_s": 45,
-
+  "interval_s": 45
 }

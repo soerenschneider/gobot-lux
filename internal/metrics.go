@@ -23,28 +23,28 @@ var (
 		Name:      "brightness_level",
 		Subsystem: "sensor",
 		Help:      "Current sensor reading of brightness level",
-	}, []string{"location"})
+	}, []string{"placement"})
 
 	metricSensorError = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Name:      "read_errors_total",
 		Subsystem: "sensor",
 		Help:      "Errors while reading the sensor",
-	}, []string{"location"})
+	}, []string{"placement"})
 
 	metricsMessagesPublished = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Name:      "messages_published_total",
 		Subsystem: "mqtt",
 		Help:      "Total number of published messages via MQTT",
-	}, []string{"location"})
+	}, []string{"placement"})
 
 	metricsMessagePublishErrors = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Name:      "message_publish_errors",
 		Subsystem: "mqtt",
 		Help:      "Total number of errors while trying to publish messages via MQTT",
-	}, []string{"location"})
+	}, []string{"placement"})
 )
 
 func StartMetricsServer(listenAddr string) {
