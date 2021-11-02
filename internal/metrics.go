@@ -18,6 +18,12 @@ var (
 		Help:      "Version information of this robot",
 	}, []string{"version", "commit"})
 
+	metricHeartbeat = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "heartbeat_seconds",
+		Help:      "Continuous heartbeat of this bot",
+	})
+
 	metricBrightness = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
 		Name:      "brightness_level",

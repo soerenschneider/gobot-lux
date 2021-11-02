@@ -59,6 +59,11 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 	metricVersionInfo.WithLabelValues(BuildVersion, CommitHash).Set(1)
 	work := func() {
 		readValueAndDispatch(bot)
+
+		gobot.Every(60*time.Second, func() {
+			metricHeartbeat.Inc()
+		})
+
 		gobot.Every(time.Duration(bot.Config.IntervalSecs)*time.Second, func() {
 			readValueAndDispatch(bot)
 		})

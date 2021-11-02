@@ -143,7 +143,7 @@ func Test_fromEnvInt(t *testing.T) {
 
 func TestConfig_Validate(t *testing.T) {
 	type fields struct {
-		Placement             string
+		Placement            string
 		MetricConfig         string
 		FirmAtaPort          string
 		AioPin               string
@@ -160,7 +160,7 @@ func TestConfig_Validate(t *testing.T) {
 		{
 			name: "all okay",
 			fields: fields{
-				Placement:             "placement",
+				Placement:            "placement",
 				MetricConfig:         ":9100",
 				FirmAtaPort:          "/dev/ttyUSB0",
 				AioPin:               "5",
@@ -193,7 +193,7 @@ func TestConfig_Validate(t *testing.T) {
 		{
 			name: "missing firmata",
 			fields: fields{
-				Placement:             "loc",
+				Placement:            "loc",
 				MetricConfig:         ":9100",
 				AioPin:               "5",
 				AioPollingIntervalMs: 75,
@@ -209,7 +209,7 @@ func TestConfig_Validate(t *testing.T) {
 		{
 			name: "missing host",
 			fields: fields{
-				Placement:             "loc",
+				Placement:            "loc",
 				MetricConfig:         ":9100",
 				FirmAtaPort:          "/dev/ttyUSB0",
 				AioPin:               "5",
@@ -330,7 +330,7 @@ func Test_matchTopic(t *testing.T) {
 
 func TestConfig_TemplateTopic(t *testing.T) {
 	type fields struct {
-		Placement   string
+		Placement  string
 		MqttConfig MqttConfig
 	}
 	tests := []struct {
