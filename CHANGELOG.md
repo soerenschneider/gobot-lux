@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.3.1...v1.4.0) (2021-11-02)
+
+
+### Features
+
+* add metric heartbeat ([c7a3d11](https://www.github.com/soerenschneider/gobot-lux/commit/c7a3d11588fa561b0b0931db8cd990afbb450d19))
+
 ### [1.3.1](https://www.github.com/soerenschneider/gobot-lux/compare/v1.3.0...v1.3.1) (2021-11-02)
 
 
