@@ -269,7 +269,11 @@ func TestReadJsonConfig(t *testing.T) {
 					Host:  "tcp://host:1883",
 					Topic: "sensors/%s/sub",
 				},
-				SensorConfig: defaultSensorConfig(),
+				SensorConfig: SensorConfig{
+					FirmAtaPort:          "/dev/my-device",
+					AioPin:               "42",
+					AioPollingIntervalMs: 25,
+				},
 			},
 			wantErr: false,
 		},
