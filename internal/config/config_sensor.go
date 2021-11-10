@@ -52,7 +52,7 @@ func (conf *SensorConfig) Validate() error {
 }
 
 func (conf *SensorConfig) ConfigFromEnv() {
-	firmataPort, err := fromEnv("AIO_PORT")
+	firmataPort, err := fromEnv("FIRMATA_PORT")
 	if err == nil {
 		conf.FirmAtaPort = firmataPort
 	}
