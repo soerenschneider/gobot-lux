@@ -16,6 +16,7 @@ const (
 	defaultLogSensor       = false
 	defaultIntervalSeconds = 30
 	defaultMetricConfig    = ":9194"
+	maxStatsBucketSeconds  = 7200
 )
 
 var (
@@ -24,28 +25,33 @@ var (
 
 	// We don't care that technically it's allowed to start with a slash
 	mqttTopicRegex = regexp.MustCompile("^([\\w%]+)(/[\\w%]+)*$")
+
+	defaultStatsBucketsSeconds = []int{15, 30, 60, 120, 300, 600, 1800}
 )
 
 type Config struct {
-	Placement    string `json:"placement,omitempty"`
-	MetricConfig string `json:"metrics_addr,omitempty"`
-	IntervalSecs int    `json:"interval_s,omitempty"`
-	LogSensor    bool   `json:"log_sensor,omitempty"`
+	Placement     string `json:"placement,omitempty"`
+	MetricConfig  string `json:"metrics_addr,omitempty"`
+	IntervalSecs  int    `json:"interval_s,omitempty"`
+	StatIntervals []int  `json:"stat_intervals,omitempty"`
+	LogSensor     bool   `json:"log_sensor,omitempty"`
 	MqttConfig
 	SensorConfig
 }
 
 type MqttConfig struct {
-	Host  string `json:"mqtt_host,omitempty"`
-	Topic string `json:"mqtt_topic,omitempty"`
+	Host       string `json:"mqtt_host,omitempty"`
+	Topic      string `json:"mqtt_topic,omitempty"`
+	StatsTopic string `json:"mqtt_stats_topic,omitempty"`
 }
 
 func DefaultConfig() Config {
 	return Config{
-		LogSensor:    defaultLogSensor,
-		IntervalSecs: defaultIntervalSeconds,
-		MetricConfig: defaultMetricConfig,
-		SensorConfig: defaultSensorConfig(),
+		LogSensor:     defaultLogSensor,
+		IntervalSecs:  defaultIntervalSeconds,
+		MetricConfig:  defaultMetricConfig,
+		StatIntervals: defaultStatsBucketsSeconds,
+		SensorConfig:  defaultSensorConfig(),
 	}
 }
 
@@ -75,6 +81,11 @@ func ConfigFromEnv() Config {
 	mqttTopic, err := fromEnv("MQTT_TOPIC")
 	if err == nil {
 		conf.Topic = mqttTopic
+	}
+
+	mqttStatsTopic, err := fromEnv("MQTT_STATS_TOPIC")
+	if err == nil {
+		conf.StatsTopic = mqttStatsTopic
 	}
 
 	metricConfig, err := fromEnv("METRICS_ADDR")
@@ -123,6 +134,18 @@ func (conf *Config) Validate() error {
 		return err
 	}
 
+	if len(conf.StatIntervals) > 0 {
+		min, _ := conf.GetStatIntervalMin()
+		if min < 1 {
+			return fmt.Errorf("minimal value in stats bucket must not be < 1: %d", min)
+		}
+
+		max, _ := conf.GetStatIntervalMax()
+		if max > maxStatsBucketSeconds {
+			return fmt.Errorf("maximal value in stats bucket must not be > %d: %d", maxStatsBucketSeconds, max)
+		}
+	}
+
 	return nil
 }
 
@@ -135,6 +158,12 @@ func (conf *Config) Print() {
 	log.Printf("IntervalSecs=%d", conf.IntervalSecs)
 	log.Printf("Host=%s", conf.Host)
 	log.Printf("Topic=%s", conf.Topic)
+	if len(conf.MqttConfig.StatsTopic) > 0 {
+		log.Printf("StatsTopic=%s", conf.Topic)
+	}
+	if len(conf.StatIntervals) > 0 {
+		log.Printf("StatIntervals=%v", conf.StatIntervals)
+	}
 
 	conf.SensorConfig.Print()
 
@@ -198,4 +227,38 @@ func (conf *Config) FormatTopic() {
 	if strings.Contains(conf.Topic, "%s") {
 		conf.Topic = fmt.Sprintf(conf.Topic, conf.Placement)
 	}
+
+	if strings.Contains(conf.StatsTopic, "%s") {
+		conf.StatsTopic = fmt.Sprintf(conf.StatsTopic, conf.Placement)
+	}
+}
+
+func (conf *Config) GetStatIntervalMin() (int, error) {
+	if len(conf.StatIntervals) == 0 {
+		return -1, fmt.Errorf("empty array provided")
+	}
+
+	min := conf.StatIntervals[0]
+	for _, val := range conf.StatIntervals {
+		if val < min {
+			min = val
+		}
+	}
+
+	return min, nil
+}
+
+func (conf *Config) GetStatIntervalMax() (int, error) {
+	if len(conf.StatIntervals) == 0 {
+		return -1, fmt.Errorf("empty array provided")
+	}
+
+	max := conf.StatIntervals[0]
+	for _, val := range conf.StatIntervals {
+		if val > max {
+			max = val
+		}
+	}
+
+	return max, nil
 }

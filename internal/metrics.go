@@ -51,6 +51,34 @@ var (
 		Subsystem: "mqtt",
 		Help:      "Total number of errors while trying to publish messages via MQTT",
 	}, []string{"placement"})
+
+	metricsStatsMin = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "min_per_interval",
+		Subsystem: "stats",
+		Help:      "Minimum sensor value during given intervals",
+	}, []string{"interval", "placement"})
+
+	metricsStatsMax = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "max_per_interval",
+		Subsystem: "stats",
+		Help:      "Maximum sensor value during given intervals",
+	}, []string{"interval", "placement"})
+
+	metricsStatsDelta = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "delta_per_interval",
+		Subsystem: "stats",
+		Help:      "Delta sensor value during given intervals",
+	}, []string{"interval", "placement"})
+
+	metricsStatsSliceSize = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "slice_entries_total",
+		Subsystem: "stats",
+		Help:      "The amount of entries in the stats slice",
+	}, []string{"placement"})
 )
 
 func StartMetricsServer(listenAddr string) {

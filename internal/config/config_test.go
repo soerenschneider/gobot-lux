@@ -164,7 +164,7 @@ func TestConfig_Validate(t *testing.T) {
 				MetricConfig:         ":9100",
 				FirmAtaPort:          "/dev/ttyUSB0",
 				AioPin:               "5",
-				AioPollingIntervalMs: 75,
+				AioPollingIntervalMs: 7005,
 				IntervalSecs:         30,
 				LogValues:            false,
 				MqttConfig: MqttConfig{
@@ -180,7 +180,7 @@ func TestConfig_Validate(t *testing.T) {
 				MetricConfig:         ":9100",
 				FirmAtaPort:          "/dev/ttyUSB0",
 				AioPin:               "5",
-				AioPollingIntervalMs: 75,
+				AioPollingIntervalMs: 7005,
 				IntervalSecs:         30,
 				LogValues:            false,
 				MqttConfig: MqttConfig{
@@ -196,7 +196,7 @@ func TestConfig_Validate(t *testing.T) {
 				Placement:            "loc",
 				MetricConfig:         ":9100",
 				AioPin:               "5",
-				AioPollingIntervalMs: 75,
+				AioPollingIntervalMs: 7005,
 				IntervalSecs:         30,
 				LogValues:            false,
 				MqttConfig: MqttConfig{
@@ -213,7 +213,7 @@ func TestConfig_Validate(t *testing.T) {
 				MetricConfig:         ":9100",
 				FirmAtaPort:          "/dev/ttyUSB0",
 				AioPin:               "5",
-				AioPollingIntervalMs: 75,
+				AioPollingIntervalMs: 1000,
 				IntervalSecs:         30,
 				LogValues:            false,
 				MqttConfig: MqttConfig{
@@ -261,13 +261,15 @@ func TestReadJsonConfig(t *testing.T) {
 			name:     "example-config",
 			filePath: "../../contrib/example-config-base.json",
 			want: &Config{
-				Placement:    "loc",
-				MetricConfig: ":1111",
-				IntervalSecs: 45,
-				LogSensor:    true,
+				Placement:     "loc",
+				MetricConfig:  ":1111",
+				IntervalSecs:  45,
+				LogSensor:     true,
+				StatIntervals: []int{1, 2, 3},
 				MqttConfig: MqttConfig{
-					Host:  "tcp://host:1883",
-					Topic: "sensors/%s/sub",
+					Host:       "tcp://host:1883",
+					Topic:      "sensors/%s/sub",
+					StatsTopic: "sensors/stats_topic",
 				},
 				SensorConfig: SensorConfig{
 					FirmAtaPort:          "/dev/my-device",

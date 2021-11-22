@@ -9,8 +9,10 @@ import (
 
 func TestAssembleBot(t *testing.T) {
 	conf := config.DefaultConfig()
+	conf.AioPollingIntervalMs = 100
+	conf.IntervalSecs = 1
 
-	sensorValue := 75
+	sensorValue := 1234
 
 	mqttAdaptor := &FakeMqttAdapter{}
 	fakeAdaptor := &FakeAdaptor{}
