@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.4.0...v1.5.0) (2021-11-22)
+
+
+### Features
+
+* Collect statistics over configurable intervals ([8c4593c](https://www.github.com/soerenschneider/gobot-lux/commit/8c4593c2bebcda2e97ffc50e79a78fbcb54672be))
+
 ## [1.4.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.3.1...v1.4.0) (2021-11-02)
 
 
