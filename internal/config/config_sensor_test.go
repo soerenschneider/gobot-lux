@@ -22,7 +22,7 @@ func TestSensorConfig_Validate(t *testing.T) {
 			fields: fields{
 				FirmAtaPort:          "/dev/ttyUSB0",
 				AioPin:               "5",
-				AioPollingIntervalMs: 75,
+				AioPollingIntervalMs: 5000,
 			},
 			wantErr: false,
 		},

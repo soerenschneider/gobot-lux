@@ -10,7 +10,7 @@ import (
 const (
 	defaultFirmataPort          = "/dev/ttyUSB0"
 	defaultAioPin               = "0"
-	defaultAioPollingIntervalMs = 500
+	defaultAioPollingIntervalMs = 1000
 )
 
 func defaultSensorConfig() SensorConfig {
@@ -36,8 +36,8 @@ func (conf *SensorConfig) Validate() error {
 		return fmt.Errorf("invalid pin provided: %d", parsedPin)
 	}
 
-	if conf.AioPollingIntervalMs < 5 {
-		return fmt.Errorf("polling interval must not be smaller than 5: %d", conf.AioPollingIntervalMs)
+	if conf.AioPollingIntervalMs < 1000 {
+		return fmt.Errorf("polling interval must not be smaller than 1000: %d", conf.AioPollingIntervalMs)
 	}
 
 	if conf.AioPollingIntervalMs > 60*1000 {
