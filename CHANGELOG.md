@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.5.1](https://www.github.com/soerenschneider/gobot-lux/compare/v1.5.0...v1.5.1) (2021-11-22)
+
+
+### Bug Fixes
+
+* add missing label ([7d1c287](https://www.github.com/soerenschneider/gobot-lux/commit/7d1c28747a4433c51c848cb43b33616dd0a4e11c))
+* set to current timestamp instead of increasing ([92c07d0](https://www.github.com/soerenschneider/gobot-lux/commit/92c07d0e36891f307f0e463008ed5bd5630a3358))
+
 ## [1.5.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.4.0...v1.5.0) (2021-11-22)
 
 
