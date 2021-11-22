@@ -93,9 +93,9 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 						Max:   max,
 						Delta: max - min,
 					}
-					metricsStatsMin.WithLabelValues(bot.Config.Placement).Set(float64(min))
-					metricsStatsMax.WithLabelValues(bot.Config.Placement).Set(float64(max))
-					metricsStatsDelta.WithLabelValues(bot.Config.Placement).Set(float64(max-min))
+					metricsStatsMin.WithLabelValues(key, bot.Config.Placement).Set(float64(min))
+					metricsStatsMax.WithLabelValues(key, bot.Config.Placement).Set(float64(max))
+					metricsStatsDelta.WithLabelValues(key, bot.Config.Placement).Set(float64(max-min))
 				}
 				stats.PurgeStatsBefore(time.Now().Add(time.Duration(-max) * time.Second))
 				metricsStatsSliceSize.WithLabelValues(bot.Config.Placement).Set(float64(stats.GetStatsSliceSize()))
