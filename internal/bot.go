@@ -50,7 +50,7 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 	readValue := math.MinInt16
 	work := func() {
 		gobot.Every(60*time.Second, func() {
-			metricHeartbeat.Inc()
+			metricHeartbeat.SetToCurrentTime()
 		})
 
 		gobot.Every(time.Duration(bot.Config.IntervalSecs)*time.Second, func() {
