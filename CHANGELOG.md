@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.5.1...v1.6.0) (2021-12-08)
+
+
+### Features
+
+* calculate avg in interval statistics ([0434246](https://www.github.com/soerenschneider/gobot-lux/commit/0434246ac7d0ff9d2c08a99d88ce1b99dc13237d))
+
 ### [1.5.1](https://www.github.com/soerenschneider/gobot-lux/compare/v1.5.0...v1.5.1) (2021-11-22)
 
 
