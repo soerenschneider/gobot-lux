@@ -46,7 +46,7 @@ func (m *BrightnessBot) publishMessage(topic string, msg []byte) {
 
 func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 	metricVersionInfo.WithLabelValues(BuildVersion, CommitHash).Set(1)
-	stats := NewSensorStats()
+	statsModule := NewSensorStats()
 	readValue := math.MinInt16
 	work := func() {
 		gobot.Every(60*time.Second, func() {
@@ -63,7 +63,7 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 		gobot.Every(time.Duration(bot.Config.AioPollingIntervalMs)*time.Millisecond, func() {
 			var err error
 			readValue, err = bot.Driver.Read()
-			stats.NewEvent(readValue)
+			statsModule.NewEvent(readValue)
 			if err != nil {
 				metricSensorError.WithLabelValues(bot.Config.Placement).Inc()
 			} else {
@@ -80,25 +80,20 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 			max, _ := bot.Config.GetStatIntervalMax()
 
 			gobot.Every(time.Duration(min)*time.Second, func() {
-				statsDict := map[string]Measure{}
+				statsDict := map[string]IntervalStatistics{}
 				for _, stat := range bot.Config.StatIntervals {
-					min, max, err := stats.GetEventCountNewerThan(time.Duration(stat) * time.Second)
+					intervalStatistics, err := statsModule.GetIntervalStats(time.Duration(stat) * time.Second)
 					if err != nil {
 						continue
 					}
 
 					key := fmt.Sprintf("%ds", stat)
-					statsDict[key] = Measure{
-						Min:   min,
-						Max:   max,
-						Delta: max - min,
-					}
-					metricsStatsMin.WithLabelValues(key, bot.Config.Placement).Set(float64(min))
-					metricsStatsMax.WithLabelValues(key, bot.Config.Placement).Set(float64(max))
-					metricsStatsDelta.WithLabelValues(key, bot.Config.Placement).Set(float64(max-min))
+					statsDict[key] = intervalStatistics
+					updateStatsIntervalMetrics(key, bot.Config.Placement, intervalStatistics)
+					max = int(intervalStatistics.Max)
 				}
-				stats.PurgeStatsBefore(time.Now().Add(time.Duration(-max) * time.Second))
-				metricsStatsSliceSize.WithLabelValues(bot.Config.Placement).Set(float64(stats.GetStatsSliceSize()))
+				statsModule.PurgeStatsBefore(time.Now().Add(time.Duration(-max) * time.Second))
+				metricsStatsSliceSize.WithLabelValues(bot.Config.Placement).Set(float64(statsModule.GetStatsSliceSize()))
 
 				json, err := json.Marshal(statsDict)
 				if err == nil {
@@ -122,8 +117,9 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 	)
 }
 
-type Measure struct {
-	Min   int16 `json:"min"`
-	Max   int16 `json:"max"`
-	Delta int16 `json:"delta"`
+func updateStatsIntervalMetrics(key, placement string, stats IntervalStatistics) {
+	metricsStatsMin.WithLabelValues(key, placement).Set(float64(stats.Min))
+	metricsStatsMax.WithLabelValues(key, placement).Set(float64(stats.Max))
+	metricsStatsDelta.WithLabelValues(key, placement).Set(float64(stats.Delta))
+	metricsStatsAvg.WithLabelValues(key, placement).Set(float64(stats.Avg))
 }

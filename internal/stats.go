@@ -46,31 +46,48 @@ func (s *SensorStats) GetStatsSliceSize() int {
 	return len(s.stats)
 }
 
-func (s *SensorStats) GetEventCountNewerThan(window time.Duration) (int16, int16, error) {
+type IntervalStatistics struct {
+	Min   int16 `json:"min"`
+	Max   int16 `json:"max"`
+	Delta int16 `json:"delta"`
+	Avg   int16 `json:"avg"`
+}
+
+func (s *SensorStats) GetIntervalStats(window time.Duration) (IntervalStatistics, error) {
 	s.m.Lock()
 	defer s.m.Unlock()
 	idx := s.getIndexOfStatsNewerThan(time.Now().Add(-window))
 	return evalInterval(s.stats, idx)
 }
 
-func evalInterval(array []Measurement, fromIndex int) (int16, int16, error) {
+func evalInterval(array []Measurement, fromIndex int) (IntervalStatistics, error) {
 	if len(array) == 0 {
-		return -1, -1, errors.New("no measurements available")
+		return IntervalStatistics{
+			Min: -1,
+			Max: -1,
+			Avg: -1,
+		}, errors.New("no measurements available")
 	}
-	min := array[fromIndex].value
-	max := array[fromIndex].value
+	ret := IntervalStatistics{
+		Min: array[fromIndex].value,
+		Max: array[fromIndex].value,
+	}
 
+	var sum int32 = int32(array[fromIndex].value)
 	for i := fromIndex + 1; i < len(array); i++ {
 		val := array[i].value
-		if val < min {
-			min = val
+		if val < ret.Min {
+			ret.Min = val
 		}
-		if val > max {
-			max = val
+		if val > ret.Max {
+			ret.Max = val
 		}
+		sum += int32(val)
 	}
 
-	return min, max, nil
+	ret.Avg = int16(sum / int32(len(array) - fromIndex))
+	ret.Delta = ret.Max - ret.Min
+	return ret, nil
 }
 
 func (s *SensorStats) getIndexOfStatsNewerThan(timestamp time.Time) int {

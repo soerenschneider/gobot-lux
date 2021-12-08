@@ -73,6 +73,13 @@ var (
 		Help:      "Delta sensor value during given intervals",
 	}, []string{"interval", "placement"})
 
+	metricsStatsAvg = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "avg_per_interval",
+		Subsystem: "stats",
+		Help:      "Avg sensor value during given intervals",
+	}, []string{"interval", "placement"})
+
 	metricsStatsSliceSize = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
 		Name:      "slice_entries_total",
