@@ -14,7 +14,7 @@ import (
 const (
 	BotName                = "gobot_lux"
 	defaultLogSensor       = false
-	defaultIntervalSeconds = 30
+	defaultIntervalSeconds = 3
 	defaultMetricConfig    = ":9194"
 	maxStatsBucketSeconds  = 7200
 )
@@ -114,8 +114,12 @@ func (conf *Config) Validate() error {
 		return errors.New("empty location provided")
 	}
 
-	if conf.IntervalSecs < 30 {
-		return fmt.Errorf("invalid interval: must not be lower than 30 but is %d", conf.IntervalSecs)
+	if conf.IntervalSecs < 1 {
+		return fmt.Errorf("invalid interval: must not be lower than 1 but is %d", conf.IntervalSecs)
+	}
+
+	if conf.IntervalSecs < conf.AioPollingIntervalMs / 1000 {
+		return fmt.Errorf("invalid interval: must not be lower than aioPollingIntervalMs (%ds): %d", conf.AioPollingIntervalMs / 1000, conf.IntervalSecs)
 	}
 
 	if conf.IntervalSecs > 300 {
