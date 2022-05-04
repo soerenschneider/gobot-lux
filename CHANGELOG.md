@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.6.0...v1.7.0) (2022-05-04)
+
+
+### Features
+
+* enable tls client cert auth ([f5e43b9](https://www.github.com/soerenschneider/gobot-lux/commit/f5e43b9b5b82ad1cc884668daee56241e9c3cd5e))
+
 ## [1.6.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.5.1...v1.6.0) (2021-12-08)
 
 
