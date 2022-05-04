@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -20,12 +19,6 @@ const (
 )
 
 var (
-	// This regex is not a very strict check, we don't validate hostname or ip (v4, v6) addresses...
-	mqttHostRegex = regexp.MustCompile(`^\w{3,}://.{3,}:\d{2,5}$`)
-
-	// We don't care that technically it's allowed to start with a slash
-	mqttTopicRegex = regexp.MustCompile("^([\\w%]+)(/[\\w%]+)*$")
-
 	defaultStatsBucketsSeconds = []int{15, 30, 60, 120, 300, 600, 1800}
 )
 
@@ -37,12 +30,6 @@ type Config struct {
 	LogSensor     bool   `json:"log_sensor,omitempty"`
 	MqttConfig
 	SensorConfig
-}
-
-type MqttConfig struct {
-	Host       string `json:"mqtt_host,omitempty"`
-	Topic      string `json:"mqtt_topic,omitempty"`
-	StatsTopic string `json:"mqtt_stats_topic,omitempty"`
 }
 
 func DefaultConfig() Config {
@@ -91,6 +78,16 @@ func ConfigFromEnv() Config {
 	metricConfig, err := fromEnv("METRICS_ADDR")
 	if err == nil {
 		conf.MetricConfig = metricConfig
+	}
+
+	clientKeyFile, err := fromEnv("SSL_CLIENT_KEY_FILE")
+	if err == nil {
+		conf.ClientKeyFile = clientKeyFile
+	}
+
+	clientCertFile, err := fromEnv("SSL_CLIENT_CERT_FILE")
+	if err == nil {
+		conf.ClientCertFile = clientCertFile
 	}
 
 	conf.SensorConfig.ConfigFromEnv()
@@ -174,20 +171,6 @@ func (conf *Config) Print() {
 	log.Println("-----------------")
 }
 
-func matchTopic(topic string) error {
-	if !mqttTopicRegex.MatchString(topic) {
-		return fmt.Errorf("invalid topic format used")
-	}
-	return nil
-}
-
-func matchHost(host string) error {
-	if !mqttHostRegex.Match([]byte(host)) {
-		return fmt.Errorf("invalid host format used")
-	}
-	return nil
-}
-
 func computeEnvName(name string) string {
 	return fmt.Sprintf("%s_%s", strings.ToUpper(BotName), strings.ToUpper(name))
 }
@@ -225,16 +208,6 @@ func fromEnvBool(name string) (bool, error) {
 		return false, err
 	}
 	return parsed, nil
-}
-
-func (conf *Config) FormatTopic() {
-	if strings.Contains(conf.Topic, "%s") {
-		conf.Topic = fmt.Sprintf(conf.Topic, conf.Placement)
-	}
-
-	if strings.Contains(conf.StatsTopic, "%s") {
-		conf.StatsTopic = fmt.Sprintf(conf.StatsTopic, conf.Placement)
-	}
 }
 
 func (conf *Config) GetStatIntervalMin() (int, error) {

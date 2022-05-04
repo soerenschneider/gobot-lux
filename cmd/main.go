@@ -38,6 +38,18 @@ func main() {
 	mqttAdaptor := mqtt.NewAdaptor(conf.MqttConfig.Host, clientId)
 	mqttAdaptor.SetAutoReconnect(true)
 	mqttAdaptor.SetQoS(1)
+
+	if conf.MqttConfig.UsesSslCerts() {
+		log.Println("Setting TLS client cert and key...")
+		mqttAdaptor.SetClientCert(conf.MqttConfig.ClientCertFile)
+		mqttAdaptor.SetClientKey(conf.MqttConfig.ClientKeyFile)
+
+		if len(conf.MqttConfig.ServerCaFile) > 0 {
+			log.Println("Setting server CA...")
+			mqttAdaptor.SetServerCert(conf.MqttConfig.ServerCaFile)
+		}
+	}
+
 	adaptors := &internal.BrightnessBot{
 		Driver:      driver,
 		Adaptor:     adaptor,
