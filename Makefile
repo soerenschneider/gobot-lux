@@ -4,7 +4,7 @@ MODULE = github.com/soerenschneider/gobot-lux
 CHECKSUM_FILE = $(BUILD_DIR)/checksum.sha256
 SIGNATURE_KEYFILE = ~/.signify/github.sec
 
-tests:
+unittest:
 	go test ./...
 
 clean:
