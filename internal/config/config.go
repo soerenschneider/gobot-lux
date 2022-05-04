@@ -115,8 +115,8 @@ func (conf *Config) Validate() error {
 		return fmt.Errorf("invalid interval: must not be lower than 1 but is %d", conf.IntervalSecs)
 	}
 
-	if conf.IntervalSecs < conf.AioPollingIntervalMs / 1000 {
-		return fmt.Errorf("invalid interval: must not be lower than aioPollingIntervalMs (%ds): %d", conf.AioPollingIntervalMs / 1000, conf.IntervalSecs)
+	if conf.IntervalSecs < conf.AioPollingIntervalMs/1000 {
+		return fmt.Errorf("invalid interval: must not be lower than aioPollingIntervalMs (%ds): %d", conf.AioPollingIntervalMs/1000, conf.IntervalSecs)
 	}
 
 	if conf.IntervalSecs > 300 {

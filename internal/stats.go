@@ -85,7 +85,7 @@ func evalInterval(array []Measurement, fromIndex int) (IntervalStatistics, error
 		sum += int32(val)
 	}
 
-	ret.Avg = int16(sum / int32(len(array) - fromIndex))
+	ret.Avg = int16(sum / int32(len(array)-fromIndex))
 	ret.Delta = ret.Max - ret.Min
 	return ret, nil
 }

@@ -17,9 +17,9 @@ var (
 )
 
 type MqttConfig struct {
-	Host       string `json:"mqtt_host,omitempty"`
-	Topic      string `json:"mqtt_topic,omitempty"`
-	StatsTopic string `json:"mqtt_stats_topic,omitempty"`
+	Host           string `json:"mqtt_host,omitempty"`
+	Topic          string `json:"mqtt_topic,omitempty"`
+	StatsTopic     string `json:"mqtt_stats_topic,omitempty"`
 	ClientKeyFile  string `json:"mqtt_ssl_key_file,omitempty""`
 	ClientCertFile string `json:"mqtt_ssl_cert_file,omitempty""`
 	ServerCaFile   string `json:"mqtt_ssl_ca_file,omitempty"`
