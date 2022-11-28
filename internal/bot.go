@@ -6,8 +6,6 @@ import (
 	"github.com/soerenschneider/gobot-lux/internal/config"
 	"gobot.io/x/gobot"
 	"log"
-	"math"
-	"strconv"
 	"time"
 )
 
@@ -47,31 +45,32 @@ func (m *BrightnessBot) publishMessage(topic string, msg []byte) {
 func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 	metricVersionInfo.WithLabelValues(BuildVersion, CommitHash).Set(1)
 	statsModule := NewSensorStats()
-	readValue := math.MinInt16
+	var valuePercent float32
 	work := func() {
 		gobot.Every(60*time.Second, func() {
 			metricHeartbeat.SetToCurrentTime()
 		})
 
 		gobot.Every(time.Duration(bot.Config.IntervalSecs)*time.Second, func() {
-			if readValue >= 0 {
-				msg := []byte(strconv.Itoa(readValue))
+			if valuePercent >= 0 {
+				msg := []byte(fmt.Sprintf("%f", valuePercent))
 				bot.publishMessage(bot.Config.Topic, msg)
 			}
 		})
 
 		gobot.Every(time.Duration(bot.Config.AioPollingIntervalMs)*time.Millisecond, func() {
-			var err error
-			readValue, err = bot.Driver.Read()
-			statsModule.NewEvent(readValue)
+			rawValue, err := bot.Driver.Read()
 			if err != nil {
 				metricSensorError.WithLabelValues(bot.Config.Placement).Inc()
+				valuePercent = -1
 			} else {
-				metricBrightness.WithLabelValues(bot.Config.Placement).Set(float64(readValue))
+				valuePercent = (1024 - float32(rawValue)) * 100 / 1024
+				statsModule.NewEvent(valuePercent)
+				metricBrightness.WithLabelValues(bot.Config.Placement).Set(float64(valuePercent))
 			}
 
 			if bot.Config.LogSensor {
-				log.Printf("Read %d from sensor", readValue)
+				log.Printf("Read %d from sensor (%f%%)", rawValue, valuePercent)
 			}
 		})
 

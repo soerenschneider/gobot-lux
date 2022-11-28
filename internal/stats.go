@@ -11,7 +11,7 @@ const maxEvents = 2048
 
 type Measurement struct {
 	timestamp time.Time
-	value     int16
+	value     float32
 }
 
 type SensorStats struct {
@@ -25,14 +25,14 @@ func NewSensorStats() *SensorStats {
 	}
 }
 
-func (s *SensorStats) NewEvent(measurement int) {
+func (s *SensorStats) NewEvent(measurement float32) {
 	s.m.Lock()
 	defer s.m.Unlock()
 
 	if len(s.stats) < maxEvents {
 		measurement := Measurement{
 			timestamp: time.Now(),
-			value:     int16(measurement),
+			value:     measurement,
 		}
 		s.stats = append(s.stats, measurement)
 	} else {
@@ -47,10 +47,10 @@ func (s *SensorStats) GetStatsSliceSize() int {
 }
 
 type IntervalStatistics struct {
-	Min   int16 `json:"min"`
-	Max   int16 `json:"max"`
-	Delta int16 `json:"delta"`
-	Avg   int16 `json:"avg"`
+	Min   float32 `json:"min"`
+	Max   float32 `json:"max"`
+	Delta float32 `json:"delta"`
+	Avg   float32 `json:"avg"`
 }
 
 func (s *SensorStats) GetIntervalStats(window time.Duration) (IntervalStatistics, error) {
@@ -73,7 +73,7 @@ func evalInterval(array []Measurement, fromIndex int) (IntervalStatistics, error
 		Max: array[fromIndex].value,
 	}
 
-	var sum int32 = int32(array[fromIndex].value)
+	var sum = array[fromIndex].value
 	for i := fromIndex + 1; i < len(array); i++ {
 		val := array[i].value
 		if val < ret.Min {
@@ -82,10 +82,10 @@ func evalInterval(array []Measurement, fromIndex int) (IntervalStatistics, error
 		if val > ret.Max {
 			ret.Max = val
 		}
-		sum += int32(val)
+		sum += val
 	}
 
-	ret.Avg = int16(sum / int32(len(array)-fromIndex))
+	ret.Avg = sum / float32(len(array)-fromIndex)
 	ret.Delta = ret.Max - ret.Min
 	return ret, nil
 }

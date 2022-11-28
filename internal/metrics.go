@@ -26,7 +26,7 @@ var (
 
 	metricBrightness = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "brightness_level",
+		Name:      "brightness_level_percent",
 		Subsystem: "sensor",
 		Help:      "Current sensor reading of brightness level",
 	}, []string{"placement"})
@@ -54,28 +54,28 @@ var (
 
 	metricsStatsMin = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "min_per_interval",
+		Name:      "min_per_interval_percent",
 		Subsystem: "stats",
 		Help:      "Minimum sensor value during given intervals",
 	}, []string{"interval", "placement"})
 
 	metricsStatsMax = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "max_per_interval",
+		Name:      "max_per_interval_percent",
 		Subsystem: "stats",
 		Help:      "Maximum sensor value during given intervals",
 	}, []string{"interval", "placement"})
 
 	metricsStatsDelta = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "delta_per_interval",
+		Name:      "delta_per_interval_percent",
 		Subsystem: "stats",
 		Help:      "Delta sensor value during given intervals",
 	}, []string{"interval", "placement"})
 
 	metricsStatsAvg = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: namespace,
-		Name:      "avg_per_interval",
+		Name:      "avg_per_interval_percent",
 		Subsystem: "stats",
 		Help:      "Avg sensor value during given intervals",
 	}, []string{"interval", "placement"})
