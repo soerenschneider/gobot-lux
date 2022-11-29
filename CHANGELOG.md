@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/soerenschneider/gobot-lux/compare/v1.7.0...v1.7.1) (2022-11-29)
+
+
+### Miscellaneous Chores
+
+* release 1.7.1 ([c03aad2](https://github.com/soerenschneider/gobot-lux/commit/c03aad2d74be2df531daa8e5198d409d4808be5f))
+
 ## [1.7.0](https://www.github.com/soerenschneider/gobot-lux/compare/v1.6.0...v1.7.0) (2022-05-04)
 
 
