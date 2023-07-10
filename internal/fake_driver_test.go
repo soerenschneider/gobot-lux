@@ -35,7 +35,7 @@ func (a *DummyAnalogSensorDriver) SetName(n string) {}
 func (a *DummyAnalogSensorDriver) Pin() string { return "5" }
 
 func (a *DummyAnalogSensorDriver) Connection() gobot.Connection {
-	return a.connection.(gobot.Connection)
+	return a.connection
 }
 
 func (a *DummyAnalogSensorDriver) Read() (val float64, err error) {
