@@ -69,6 +69,7 @@ func exceedsDeviation(prevReading, prevSent, now float64) bool {
 func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 	metricVersionInfo.WithLabelValues(BuildVersion, CommitHash).Set(1)
 	statsModule := NewSensorStats()
+	mutex := &sync.RWMutex{}
 	var valuePercent, valuePercentSent float64
 	work := func() {
 		gobot.Every(60*time.Second, func() {
@@ -76,6 +77,9 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 		})
 
 		gobot.Every(time.Duration(bot.Config.IntervalSecs)*time.Second, func() {
+			mutex.RLock()
+			defer mutex.RUnlock()
+
 			if valuePercent >= 0 {
 				valuePercentSent = valuePercent
 				msg := []byte(fmt.Sprintf("%f", valuePercent))
@@ -84,6 +88,9 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 		})
 
 		gobot.Every(time.Duration(bot.Config.AioPollingIntervalMs)*time.Millisecond, func() {
+			mutex.Lock()
+			defer mutex.Unlock()
+
 			rawValue, err := bot.Driver.Read()
 			if err != nil {
 				metricSensorError.WithLabelValues(bot.Config.Placement).Inc()

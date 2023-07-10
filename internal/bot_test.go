@@ -1,10 +1,11 @@
 package internal
 
 import (
-	"github.com/soerenschneider/gobot-lux/internal/config"
-	"strconv"
+	"fmt"
 	"testing"
 	"time"
+
+	"github.com/soerenschneider/gobot-lux/internal/config"
 )
 
 func TestAssembleBot(t *testing.T) {
@@ -12,7 +13,8 @@ func TestAssembleBot(t *testing.T) {
 	conf.AioPollingIntervalMs = 100
 	conf.IntervalSecs = 1
 
-	sensorValue := 1234
+	sensorValue := MaxSensorValue / 2.
+	expected := 50. // 100% / 2 -> 50
 
 	mqttAdaptor := &FakeMqttAdapter{}
 	fakeAdaptor := &FakeAdaptor{}
@@ -28,12 +30,13 @@ func TestAssembleBot(t *testing.T) {
 	go bot.Start()
 
 	time.Sleep(2 * time.Second)
+
 	err := bot.Stop()
 	if err != nil {
 		t.Error("Error while stopping bot")
 	}
 
-	if string(mqttAdaptor.Msg) != string([]byte(strconv.Itoa(analogSensor.value))) {
-		t.Errorf("Expected to read value %d, got %s", sensorValue, mqttAdaptor.Msg)
+	if mqttAdaptor.Message() != fmt.Sprintf("%f", expected) {
+		t.Errorf("Expected to read value %f, got %s", sensorValue, mqttAdaptor.Msg)
 	}
 }
