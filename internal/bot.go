@@ -6,8 +6,11 @@ import (
 	"github.com/soerenschneider/gobot-lux/internal/config"
 	"gobot.io/x/gobot"
 	"log"
+	"math"
 	"time"
 )
+
+var deviationPercent float64 = 5
 
 type BrightnessDriver interface {
 	Read() (val int, err error)
@@ -42,10 +45,26 @@ func (m *BrightnessBot) publishMessage(topic string, msg []byte) {
 	}
 }
 
+// exceedsDeviation compares the newest sensor value with the last sent
+// and the last read value and returns whether they exceed a deviation threshold.
+// Using this function as decision on whether to dispatch a sensor value immediately
+// can be used to set a higher IntervalSecs value but still get deviated values
+// immediately.
+func exceedsDeviation(prevReading, prevSent, now float32) bool {
+	if math.Abs(float64(prevReading-now)) >= deviationPercent {
+		return true
+	}
+	if math.Abs(float64(prevSent-now)) >= deviationPercent {
+		return true
+	}
+
+	return false
+}
+
 func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 	metricVersionInfo.WithLabelValues(BuildVersion, CommitHash).Set(1)
 	statsModule := NewSensorStats()
-	var valuePercent float32
+	var valuePercent, valuePercentSent float32
 	work := func() {
 		gobot.Every(60*time.Second, func() {
 			metricHeartbeat.SetToCurrentTime()
@@ -53,6 +72,7 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 
 		gobot.Every(time.Duration(bot.Config.IntervalSecs)*time.Second, func() {
 			if valuePercent >= 0 {
+				valuePercentSent = valuePercent
 				msg := []byte(fmt.Sprintf("%f", valuePercent))
 				bot.publishMessage(bot.Config.Topic, msg)
 			}
@@ -64,7 +84,12 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 				metricSensorError.WithLabelValues(bot.Config.Placement).Inc()
 				valuePercent = -1
 			} else {
+				prevValue := valuePercent
 				valuePercent = (1024 - float32(rawValue)) * 100 / 1024
+				if exceedsDeviation(prevValue, valuePercentSent, valuePercent) {
+					msg := []byte(fmt.Sprintf("%f", valuePercent))
+					bot.publishMessage(bot.Config.Topic, msg)
+				}
 				statsModule.NewEvent(valuePercent)
 				metricBrightness.WithLabelValues(bot.Config.Placement).Set(float64(valuePercent))
 			}

@@ -13,7 +13,7 @@ import (
 const (
 	BotName                = "gobot_lux"
 	defaultLogSensor       = false
-	defaultIntervalSeconds = 3
+	defaultIntervalSeconds = 30
 	defaultMetricConfig    = ":9194"
 	maxStatsBucketSeconds  = 7200
 )

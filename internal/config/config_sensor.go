@@ -10,7 +10,7 @@ import (
 const (
 	defaultFirmataPort          = "/dev/ttyUSB0"
 	defaultAioPin               = "0"
-	defaultAioPollingIntervalMs = 1000
+	defaultAioPollingIntervalMs = 750
 )
 
 func defaultSensorConfig() SensorConfig {
