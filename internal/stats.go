@@ -16,7 +16,7 @@ type Measurement struct {
 
 type SensorStats struct {
 	stats []Measurement
-	m     sync.Mutex
+	m     sync.RWMutex
 }
 
 func NewSensorStats() *SensorStats {
@@ -41,8 +41,8 @@ func (s *SensorStats) NewEvent(measurement float32) {
 }
 
 func (s *SensorStats) GetStatsSliceSize() int {
-	s.m.Lock()
-	defer s.m.Unlock()
+	s.m.RLock()
+	defer s.m.RUnlock()
 	return len(s.stats)
 }
 
@@ -54,8 +54,8 @@ type IntervalStatistics struct {
 }
 
 func (s *SensorStats) GetIntervalStats(window time.Duration) (IntervalStatistics, error) {
-	s.m.Lock()
-	defer s.m.Unlock()
+	s.m.RLock()
+	defer s.m.RUnlock()
 	idx := s.getIndexOfStatsNewerThan(time.Now().Add(-window))
 	return evalInterval(s.stats, idx)
 }
@@ -91,6 +91,8 @@ func evalInterval(array []Measurement, fromIndex int) (IntervalStatistics, error
 }
 
 func (s *SensorStats) getIndexOfStatsNewerThan(timestamp time.Time) int {
+	s.m.RLock()
+	defer s.m.RUnlock()
 	for index, event := range s.stats {
 		if event.timestamp.After(timestamp) {
 			return index
