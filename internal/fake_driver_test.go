@@ -1,13 +1,15 @@
 package internal
 
 import (
-	"gobot.io/x/gobot"
 	"log"
+	"sync"
+
+	"gobot.io/x/gobot/v2"
 )
 
 type DummyAnalogSensorDriver struct {
 	connection gobot.Connection
-	value      int
+	value      float64
 	gobot.Eventer
 	gobot.Commander
 }
@@ -36,13 +38,14 @@ func (a *DummyAnalogSensorDriver) Connection() gobot.Connection {
 	return a.connection.(gobot.Connection)
 }
 
-func (a *DummyAnalogSensorDriver) Read() (val int, err error) {
+func (a *DummyAnalogSensorDriver) Read() (val float64, err error) {
 	return a.value, nil
 }
 
 type FakeMqttAdapter struct {
 	Msg   []byte
 	Topic string
+	mutex sync.Mutex
 }
 
 func (m *FakeMqttAdapter) Name() string {
@@ -54,11 +57,20 @@ func (m *FakeMqttAdapter) SetName(n string) {
 func (m *FakeMqttAdapter) Connect() error {
 	return nil
 }
+func (m *FakeMqttAdapter) Message() string {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return string(m.Msg)
+}
+
 func (m *FakeMqttAdapter) Finalize() error {
 	return nil
 }
 
 func (m *FakeMqttAdapter) Publish(topic string, msg []byte) bool {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	m.Topic = topic
 	m.Msg = msg
 	log.Printf("%s -> %v", topic, string(msg))

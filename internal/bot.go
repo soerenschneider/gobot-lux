@@ -3,17 +3,21 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/soerenschneider/gobot-lux/internal/config"
-	"gobot.io/x/gobot"
 	"log"
 	"math"
+	"sync"
 	"time"
+
+	"github.com/soerenschneider/gobot-lux/internal/config"
+	"gobot.io/x/gobot/v2"
 )
+
+const MaxSensorValue = 1024.
 
 var deviationPercent float64 = 5
 
 type BrightnessDriver interface {
-	Read() (val int, err error)
+	Read() (val float64, err error)
 	Name() string
 	SetName(name string)
 	Start() error
@@ -50,11 +54,12 @@ func (m *BrightnessBot) publishMessage(topic string, msg []byte) {
 // Using this function as decision on whether to dispatch a sensor value immediately
 // can be used to set a higher IntervalSecs value but still get deviated values
 // immediately.
-func exceedsDeviation(prevReading, prevSent, now float32) bool {
-	if math.Abs(float64(prevReading-now)) >= deviationPercent {
+func exceedsDeviation(prevReading, prevSent, now float64) bool {
+	if math.Abs(prevReading-now) >= deviationPercent {
 		return true
 	}
-	if math.Abs(float64(prevSent-now)) >= deviationPercent {
+
+	if math.Abs(prevSent-now) >= deviationPercent {
 		return true
 	}
 
@@ -64,7 +69,7 @@ func exceedsDeviation(prevReading, prevSent, now float32) bool {
 func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 	metricVersionInfo.WithLabelValues(BuildVersion, CommitHash).Set(1)
 	statsModule := NewSensorStats()
-	var valuePercent, valuePercentSent float32
+	var valuePercent, valuePercentSent float64
 	work := func() {
 		gobot.Every(60*time.Second, func() {
 			metricHeartbeat.SetToCurrentTime()
@@ -85,17 +90,17 @@ func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 				valuePercent = -1
 			} else {
 				prevValue := valuePercent
-				valuePercent = (1024 - float32(rawValue)) * 100 / 1024
+				valuePercent = (MaxSensorValue - rawValue) * 100 / MaxSensorValue
 				if exceedsDeviation(prevValue, valuePercentSent, valuePercent) {
 					msg := []byte(fmt.Sprintf("%f", valuePercent))
 					bot.publishMessage(bot.Config.Topic, msg)
 				}
-				statsModule.NewEvent(valuePercent)
-				metricBrightness.WithLabelValues(bot.Config.Placement).Set(float64(valuePercent))
+				statsModule.NewEvent(float32(valuePercent))
+				metricBrightness.WithLabelValues(bot.Config.Placement).Set(valuePercent)
 			}
 
 			if bot.Config.LogSensor {
-				log.Printf("Read %d from sensor (%f%%)", rawValue, valuePercent)
+				log.Printf("Read %f from sensor (%f%%)", rawValue, valuePercent)
 			}
 		})
 

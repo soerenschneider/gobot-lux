@@ -3,14 +3,15 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/soerenschneider/gobot-lux/internal"
-	"github.com/soerenschneider/gobot-lux/internal/config"
-	"gobot.io/x/gobot/drivers/aio"
-	"gobot.io/x/gobot/platforms/firmata"
-	"gobot.io/x/gobot/platforms/mqtt"
 	"log"
 	"os"
 	"time"
+
+	"github.com/soerenschneider/gobot-lux/internal"
+	"github.com/soerenschneider/gobot-lux/internal/config"
+	"gobot.io/x/gobot/v2/drivers/aio"
+	"gobot.io/x/gobot/v2/platforms/firmata"
+	"gobot.io/x/gobot/v2/platforms/mqtt"
 )
 
 const (
