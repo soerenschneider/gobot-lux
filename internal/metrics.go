@@ -1,12 +1,15 @@
 package internal
 
 import (
+	"errors"
+	"log"
+	"net/http"
+	"time"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/soerenschneider/gobot-lux/internal/config"
-	"log"
-	"net/http"
 )
 
 const namespace = config.BotName
@@ -90,9 +93,18 @@ var (
 
 func StartMetricsServer(listenAddr string) {
 	log.Printf("Starting metrics listener at %s", listenAddr)
-	http.Handle("/metrics", promhttp.Handler())
-	err := http.ListenAndServe(listenAddr, nil)
-	if err != nil {
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+	server := http.Server{
+		Addr:              listenAddr,
+		Handler:           mux,
+		ReadHeaderTimeout: 3 * time.Second,
+		ReadTimeout:       3 * time.Second,
+		WriteTimeout:      3 * time.Second,
+		IdleTimeout:       30 * time.Second,
+	}
+
+	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("Could not start metrics listener: %v", err)
 	}
 }

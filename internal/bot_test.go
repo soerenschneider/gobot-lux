@@ -19,19 +19,19 @@ func TestAssembleBot(t *testing.T) {
 	mqttAdaptor := &FakeMqttAdapter{}
 	fakeAdaptor := &FakeAdaptor{}
 	analogSensor := &DummyAnalogSensorDriver{value: sensorValue}
-	station := &BrightnessBot{
-		Driver:      analogSensor,
-		Adaptor:     fakeAdaptor,
-		MqttAdaptor: mqttAdaptor,
-		Config:      conf,
+	station, err := NewBrightnessBot(analogSensor, fakeAdaptor, mqttAdaptor, conf)
+	if err != nil {
+		t.Error(err)
 	}
 
 	bot := AssembleBot(station)
-	go bot.Start()
+	go func() {
+		_ = bot.Start()
+	}()
 
 	time.Sleep(2 * time.Second)
 
-	err := bot.Stop()
+	err = bot.Stop()
 	if err != nil {
 		t.Error("Error while stopping bot")
 	}

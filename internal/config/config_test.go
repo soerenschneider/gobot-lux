@@ -62,45 +62,45 @@ func Test_fromEnvBool1(t *testing.T) {
 
 func Test_matchHost(t *testing.T) {
 	tests := []struct {
-		name    string
-		host    string
-		wantErr bool
+		name string
+		host string
+		want bool
 	}{
 		{
-			name:    "no tld",
-			host:    "tcp://hostname:1883",
-			wantErr: false,
+			name: "no tld",
+			host: "tcp://hostname:1883",
+			want: true,
 		},
 		{
-			name:    "tld",
-			host:    "tcp://hostname.my.tld:1883",
-			wantErr: false,
+			name: "tld",
+			host: "tcp://hostname.my.tld:1883",
+			want: true,
 		},
 		{
-			name:    "ip",
-			host:    "tcp://192.168.0.1:1883",
-			wantErr: false,
+			name: "ip",
+			host: "tcp://192.168.0.1:1883",
+			want: true,
 		},
 		{
-			name:    "no protocol",
-			host:    "192.168.0.1:1883",
-			wantErr: true,
+			name: "no protocol",
+			host: "192.168.0.1:1883",
+			want: false,
 		},
 		{
-			name:    "no port",
-			host:    "tcp://host",
-			wantErr: true,
+			name: "no port",
+			host: "tcp://host",
+			want: false,
 		},
 		{
-			name:    "only host",
-			host:    "host",
-			wantErr: true,
+			name: "only host",
+			host: "host",
+			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := matchHost(tt.host); (err != nil) != tt.wantErr {
-				t.Errorf("matchHost() error = %v, wantErr %v", err, tt.wantErr)
+			if got := matchHost(tt.host); (got) != tt.want {
+				t.Errorf("matchHost() error = %v, wantErr %v", got, tt.want)
 			}
 		})
 	}
@@ -161,7 +161,7 @@ func TestConfig_Validate(t *testing.T) {
 			name: "all okay",
 			fields: fields{
 				Placement:            "placement",
-				MetricConfig:         ":9100",
+				MetricConfig:         "0.0.0.0:9100",
 				FirmAtaPort:          "/dev/ttyUSB0",
 				AioPin:               "5",
 				AioPollingIntervalMs: 7005,
@@ -296,39 +296,39 @@ func TestReadJsonConfig(t *testing.T) {
 
 func Test_matchTopic(t *testing.T) {
 	tests := []struct {
-		name    string
-		topic   string
-		wantErr bool
+		name  string
+		topic string
+		want  bool
 	}{
 		{
-			topic:   "topicname",
-			wantErr: false,
+			topic: "topicname",
+			want:  true,
 		},
 		{
-			topic:   "more/complicated",
-			wantErr: false,
+			topic: "more/complicated",
+			want:  true,
 		},
 		{
-			topic:   "more/complicated/topic",
-			wantErr: false,
+			topic: "more/complicated/topic",
+			want:  true,
 		},
 		{
-			topic:   "/leading",
-			wantErr: true,
+			topic: "/leading",
+			want:  false,
 		},
 		{
-			topic:   "trailing/",
-			wantErr: true,
+			topic: "trailing/",
+			want:  false,
 		},
 		{
-			topic:   "replace/%s",
-			wantErr: false,
+			topic: "replace/%s",
+			want:  true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := matchTopic(tt.topic); (err != nil) != tt.wantErr {
-				t.Errorf("matchTopic() error = %v, wantErr %v", err, tt.wantErr)
+			if got := matchTopic(tt.topic); got != tt.want {
+				t.Errorf("matchTopic() error = %v, wantErr %v", got, tt.want)
 			}
 		})
 	}
@@ -384,6 +384,125 @@ func TestConfig_TemplateTopic(t *testing.T) {
 			conf.FormatTopic()
 			if !reflect.DeepEqual(conf, tt.want) {
 				t.Fail()
+			}
+		})
+	}
+}
+
+func TestConfig_Validate1(t *testing.T) {
+	type fields struct {
+		Placement     string
+		MetricConfig  string
+		IntervalSecs  int
+		StatIntervals []int
+		LogSensor     bool
+		MqttConfig    MqttConfig
+		SensorConfig  SensorConfig
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			fields: fields{
+				Placement:     "kitchen",
+				MetricConfig:  "127.0.0.1:9100",
+				IntervalSecs:  60,
+				StatIntervals: nil,
+				LogSensor:     false,
+				MqttConfig: MqttConfig{
+					Host:           "tcp://broker:1883",
+					Topic:          "lux",
+					StatsTopic:     "stats_lux",
+					ClientKeyFile:  "/etc/passwd",
+					ClientCertFile: "/etc/passwd",
+					ServerCaFile:   "/etc/passwd",
+				},
+				SensorConfig: SensorConfig{
+					FirmAtaPort:          "port",
+					AioPin:               "8",
+					AioPollingIntervalMs: 1000,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid - no tls",
+			fields: fields{
+				Placement:     "kitchen",
+				MetricConfig:  "127.0.0.1:9100",
+				IntervalSecs:  60,
+				StatIntervals: nil,
+				LogSensor:     false,
+				MqttConfig: MqttConfig{
+					Host:       "tcp://broker:1883",
+					Topic:      "lux",
+					StatsTopic: "stats_lux",
+				},
+				SensorConfig: SensorConfig{
+					FirmAtaPort:          "port",
+					AioPin:               "8",
+					AioPollingIntervalMs: 1000,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid - no tls, no metrics",
+			fields: fields{
+				Placement:     "kitchen",
+				IntervalSecs:  60,
+				StatIntervals: nil,
+				LogSensor:     false,
+				MqttConfig: MqttConfig{
+					Host:       "tcp://broker:1883",
+					Topic:      "lux",
+					StatsTopic: "stats_lux",
+				},
+				SensorConfig: SensorConfig{
+					FirmAtaPort:          "port",
+					AioPin:               "8",
+					AioPollingIntervalMs: 1000,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid - no tls, no metrics",
+			fields: fields{
+				Placement:     "kitchen",
+				IntervalSecs:  60,
+				StatIntervals: nil,
+				LogSensor:     false,
+				MqttConfig: MqttConfig{
+					Host:       "ssl://broker:1883",
+					Topic:      "lux/%s",
+					StatsTopic: "stats_lux",
+				},
+				SensorConfig: SensorConfig{
+					FirmAtaPort:          "port",
+					AioPin:               "8",
+					AioPollingIntervalMs: 1000,
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			conf := &Config{
+				Placement:     tt.fields.Placement,
+				MetricConfig:  tt.fields.MetricConfig,
+				IntervalSecs:  tt.fields.IntervalSecs,
+				StatIntervals: tt.fields.StatIntervals,
+				LogSensor:     tt.fields.LogSensor,
+				MqttConfig:    tt.fields.MqttConfig,
+				SensorConfig:  tt.fields.SensorConfig,
+			}
+			if err := conf.Validate(); (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

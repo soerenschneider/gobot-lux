@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -33,19 +34,41 @@ type MqttAdapter interface {
 }
 
 type BrightnessBot struct {
-	Driver      BrightnessDriver
-	Adaptor     gobot.Connection
-	MqttAdaptor MqttAdapter
+	Driver           BrightnessDriver
+	Adaptor          gobot.Connection
+	MqttAdaptor      MqttAdapter
+	statsModule      *SensorStats
+	mutex            *sync.RWMutex
+	valuePercent     float64
+	valuePercentSent float64
 
 	Config config.Config
 }
 
-func (m *BrightnessBot) publishMessage(topic string, msg []byte) {
-	success := m.MqttAdaptor.Publish(topic, msg)
+func NewBrightnessBot(driver BrightnessDriver, adaptor gobot.Connection, mqtt MqttAdapter, conf config.Config) (*BrightnessBot, error) {
+	if driver == nil {
+		return nil, errors.New("nil driver passed")
+	}
+	if adaptor == nil {
+		return nil, errors.New("nil connection passed")
+	}
+
+	return &BrightnessBot{
+		Driver:      driver,
+		Adaptor:     adaptor,
+		MqttAdaptor: mqtt,
+		statsModule: NewSensorStats(),
+		mutex:       &sync.RWMutex{},
+		Config:      conf,
+	}, nil
+}
+
+func (bot *BrightnessBot) publishMessage(topic string, msg []byte) {
+	success := bot.MqttAdaptor.Publish(topic, msg)
 	if success {
-		metricsMessagesPublished.WithLabelValues(m.Config.Placement).Inc()
+		metricsMessagesPublished.WithLabelValues(bot.Config.Placement).Inc()
 	} else {
-		metricsMessagePublishErrors.WithLabelValues(m.Config.Placement).Inc()
+		metricsMessagePublishErrors.WithLabelValues(bot.Config.Placement).Inc()
 	}
 }
 
@@ -66,78 +89,81 @@ func exceedsDeviation(prevReading, prevSent, now float64) bool {
 	return false
 }
 
+func (bot *BrightnessBot) updateStats() {
+	bot.mutex.RLock()
+	defer bot.mutex.RUnlock()
+
+	if bot.valuePercent >= 0 {
+		bot.valuePercentSent = bot.valuePercent
+		msg := []byte(fmt.Sprintf("%f", bot.valuePercent))
+		bot.publishMessage(bot.Config.Topic, msg)
+	}
+}
+
+func (bot *BrightnessBot) updateValue() {
+	bot.mutex.Lock()
+	defer bot.mutex.Unlock()
+
+	rawValue, err := bot.Driver.Read()
+	if err != nil {
+		metricSensorError.WithLabelValues(bot.Config.Placement).Inc()
+		bot.valuePercent = -1
+	} else {
+		prevValue := bot.valuePercent
+		bot.valuePercent = (MaxSensorValue - rawValue) * 100 / MaxSensorValue
+		if exceedsDeviation(prevValue, bot.valuePercentSent, bot.valuePercent) {
+			msg := []byte(fmt.Sprintf("%f", bot.valuePercent))
+			bot.publishMessage(bot.Config.Topic, msg)
+		}
+		bot.statsModule.NewEvent(float32(bot.valuePercent))
+		metricBrightness.WithLabelValues(bot.Config.Placement).Set(bot.valuePercent)
+	}
+
+	if bot.Config.LogSensor {
+		log.Printf("Read %f from sensor (%f%%)", rawValue, bot.valuePercent)
+	}
+}
+
+func (bot *BrightnessBot) sendStats() {
+	max, _ := bot.Config.GetStatIntervalMax()
+	statsDict := map[string]IntervalStatistics{}
+	for _, stat := range bot.Config.StatIntervals {
+		intervalStatistics, err := bot.statsModule.GetIntervalStats(time.Duration(stat) * time.Second)
+		if err != nil {
+			continue
+		}
+
+		key := fmt.Sprintf("%ds", stat)
+		statsDict[key] = intervalStatistics
+		updateStatsIntervalMetrics(key, bot.Config.Placement, intervalStatistics)
+		max = int(intervalStatistics.Max)
+	}
+	bot.statsModule.PurgeStatsBefore(time.Now().Add(time.Duration(-max) * time.Second))
+	metricsStatsSliceSize.WithLabelValues(bot.Config.Placement).Set(float64(bot.statsModule.GetStatsSliceSize()))
+
+	json, err := json.Marshal(statsDict)
+	if err == nil {
+		bot.publishMessage(bot.Config.StatsTopic, json)
+	} else {
+		log.Printf("Error while marshalling json: %v", err)
+	}
+}
+
 func AssembleBot(bot *BrightnessBot) *gobot.Robot {
 	metricVersionInfo.WithLabelValues(BuildVersion, CommitHash).Set(1)
-	statsModule := NewSensorStats()
-	mutex := &sync.RWMutex{}
-	var valuePercent, valuePercentSent float64
+
 	work := func() {
 		gobot.Every(60*time.Second, func() {
 			metricHeartbeat.SetToCurrentTime()
 		})
 
-		gobot.Every(time.Duration(bot.Config.IntervalSecs)*time.Second, func() {
-			mutex.RLock()
-			defer mutex.RUnlock()
+		gobot.Every(time.Duration(bot.Config.IntervalSecs)*time.Second, bot.updateStats)
 
-			if valuePercent >= 0 {
-				valuePercentSent = valuePercent
-				msg := []byte(fmt.Sprintf("%f", valuePercent))
-				bot.publishMessage(bot.Config.Topic, msg)
-			}
-		})
-
-		gobot.Every(time.Duration(bot.Config.AioPollingIntervalMs)*time.Millisecond, func() {
-			mutex.Lock()
-			defer mutex.Unlock()
-
-			rawValue, err := bot.Driver.Read()
-			if err != nil {
-				metricSensorError.WithLabelValues(bot.Config.Placement).Inc()
-				valuePercent = -1
-			} else {
-				prevValue := valuePercent
-				valuePercent = (MaxSensorValue - rawValue) * 100 / MaxSensorValue
-				if exceedsDeviation(prevValue, valuePercentSent, valuePercent) {
-					msg := []byte(fmt.Sprintf("%f", valuePercent))
-					bot.publishMessage(bot.Config.Topic, msg)
-				}
-				statsModule.NewEvent(float32(valuePercent))
-				metricBrightness.WithLabelValues(bot.Config.Placement).Set(valuePercent)
-			}
-
-			if bot.Config.LogSensor {
-				log.Printf("Read %f from sensor (%f%%)", rawValue, valuePercent)
-			}
-		})
+		gobot.Every(time.Duration(bot.Config.AioPollingIntervalMs)*time.Millisecond, bot.updateValue)
 
 		if len(bot.Config.MqttConfig.StatsTopic) != 0 && len(bot.Config.StatIntervals) > 0 {
 			min, _ := bot.Config.GetStatIntervalMin()
-			max, _ := bot.Config.GetStatIntervalMax()
-
-			gobot.Every(time.Duration(min)*time.Second, func() {
-				statsDict := map[string]IntervalStatistics{}
-				for _, stat := range bot.Config.StatIntervals {
-					intervalStatistics, err := statsModule.GetIntervalStats(time.Duration(stat) * time.Second)
-					if err != nil {
-						continue
-					}
-
-					key := fmt.Sprintf("%ds", stat)
-					statsDict[key] = intervalStatistics
-					updateStatsIntervalMetrics(key, bot.Config.Placement, intervalStatistics)
-					max = int(intervalStatistics.Max)
-				}
-				statsModule.PurgeStatsBefore(time.Now().Add(time.Duration(-max) * time.Second))
-				metricsStatsSliceSize.WithLabelValues(bot.Config.Placement).Set(float64(statsModule.GetStatsSliceSize()))
-
-				json, err := json.Marshal(statsDict)
-				if err == nil {
-					bot.publishMessage(bot.Config.StatsTopic, json)
-				} else {
-					log.Printf("Error while marshalling json: %v", err)
-				}
-			})
+			gobot.Every(time.Duration(min)*time.Second, bot.sendStats)
 		}
 	}
 

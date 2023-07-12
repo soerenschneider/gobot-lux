@@ -1,9 +1,7 @@
 package config
 
 import (
-	"errors"
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -17,59 +15,24 @@ var (
 )
 
 type MqttConfig struct {
-	Host           string `json:"mqtt_host,omitempty"`
-	Topic          string `json:"mqtt_topic,omitempty"`
-	StatsTopic     string `json:"mqtt_stats_topic,omitempty"`
-	ClientKeyFile  string `json:"mqtt_ssl_key_file,omitempty"`
-	ClientCertFile string `json:"mqtt_ssl_cert_file,omitempty"`
-	ServerCaFile   string `json:"mqtt_ssl_ca_file,omitempty"`
-}
-
-func (conf *MqttConfig) Validate() error {
-	if err := matchTopic(conf.Topic); err != nil {
-		return errors.New("invalid mqtt topic provided")
-	}
-
-	if err := matchHost(conf.Host); err != nil {
-		return err
-	}
-
-	return nil
+	Host           string `json:"mqtt_host,omitempty" validate:"required,mqtt_broker"`
+	Topic          string `json:"mqtt_topic,omitempty" validate:"required,mqtt_topic"`
+	StatsTopic     string `json:"mqtt_stats_topic,omitempty" validate:"omitempty,mqtt_topic"`
+	ClientKeyFile  string `json:"mqtt_ssl_key_file,omitempty" validate:"required_unless=ClientCertFile '' ClientCertFile '',omitempty,file"`
+	ClientCertFile string `json:"mqtt_ssl_cert_file,omitempty" validate:"required_unless=ClientKeyFile '' ServerCaFile '',omitempty,file"`
+	ServerCaFile   string `json:"mqtt_ssl_ca_file,omitempty" validate:"required_unless=ClientKeyFile '' ClientCertFile '',omitempty,file"`
 }
 
 func (conf *MqttConfig) UsesSslCerts() bool {
 	return len(conf.ClientCertFile) > 0 && len(conf.ClientKeyFile) > 0
 }
 
-func (conf *MqttConfig) Print() {
-	log.Printf("Host=%s", conf.Host)
-	log.Printf("Topic=%s", conf.Topic)
-	if len(conf.StatsTopic) > 0 {
-		log.Printf("StatsTopic=%s", conf.StatsTopic)
-	}
-	if conf.UsesSslCerts() {
-		log.Printf("ClientCertificateFile=%s", conf.ClientCertFile)
-	}
-	if conf.UsesSslCerts() {
-		log.Printf("ClientKeyFile=%s", conf.ClientKeyFile)
-	}
-	if len(conf.ServerCaFile) > 0 {
-		log.Printf("ServerCaFile=%s", conf.ServerCaFile)
-	}
+func matchTopic(topic string) bool {
+	return mqttTopicRegex.MatchString(topic)
 }
 
-func matchTopic(topic string) error {
-	if !mqttTopicRegex.MatchString(topic) {
-		return fmt.Errorf("invalid topic format used")
-	}
-	return nil
-}
-
-func matchHost(host string) error {
-	if !mqttHostRegex.Match([]byte(host)) {
-		return fmt.Errorf("invalid host format used")
-	}
-	return nil
+func matchHost(host string) bool {
+	return mqttHostRegex.Match([]byte(host))
 }
 
 func (conf *Config) FormatTopic() {

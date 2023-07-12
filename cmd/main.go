@@ -51,11 +51,9 @@ func main() {
 		}
 	}
 
-	adaptors := &internal.BrightnessBot{
-		Driver:      driver,
-		Adaptor:     adaptor,
-		MqttAdaptor: mqttAdaptor,
-		Config:      conf,
+	adaptors, err := internal.NewBrightnessBot(driver, adaptor, mqttAdaptor, conf)
+	if err != nil {
+		log.Fatalf("could not build bot: %v", err)
 	}
 
 	bot := internal.AssembleBot(adaptors)

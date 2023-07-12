@@ -6,8 +6,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
+	"sync"
+
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -20,13 +24,15 @@ const (
 
 var (
 	defaultStatsBucketsSeconds = []int{15, 30, 60, 120, 300, 600, 1800}
+	once                       sync.Once
+	validate                   *validator.Validate
 )
 
 type Config struct {
-	Placement     string `json:"placement,omitempty"`
-	MetricConfig  string `json:"metrics_addr,omitempty"`
-	IntervalSecs  int    `json:"interval_s,omitempty"`
-	StatIntervals []int  `json:"stat_intervals,omitempty"`
+	Placement     string `json:"placement,omitempty" validate:"required"`
+	MetricConfig  string `json:"metrics_addr,omitempty" validate:"omitempty,tcp_addr"`
+	IntervalSecs  int    `json:"interval_s,omitempty" validate:"min=1,max=300"`
+	StatIntervals []int  `json:"stat_intervals,omitempty" validate:"dive,min=10,max=3600"`
 	LogSensor     bool   `json:"log_sensor,omitempty"`
 	MqttConfig
 	SensorConfig
@@ -107,6 +113,50 @@ func ReadJsonConfig(filePath string) (*Config, error) {
 }
 
 func (conf *Config) Validate() error {
+	once.Do(func() {
+		validate = validator.New()
+		if err := validate.RegisterValidation("mqtt_topic", validateTopic); err != nil {
+			log.Fatal("could not build custom validation 'mqtt_topic'")
+		}
+		if err := validate.RegisterValidation("mqtt_broker", validateBroker); err != nil {
+			log.Fatal("could not build custom validation 'validateBroker'")
+		}
+	})
+	return validate.Struct(conf)
+}
+
+func validateTopic(fl validator.FieldLevel) bool {
+	// Get the field value and check if it's a slice
+	field := fl.Field()
+	if field.Kind() != reflect.String {
+		return false
+	}
+
+	topic, ok := field.Interface().(string)
+	if !ok || !matchTopic(topic) {
+		return false
+	}
+
+	return true
+}
+
+func validateBroker(fl validator.FieldLevel) bool {
+	// Get the field value and check if it's a slice
+	field := fl.Field()
+	if field.Kind() != reflect.String {
+		return false
+	}
+
+	// Convert to string and check its value
+	broker, ok := field.Interface().(string)
+	if !ok || !matchHost(broker) {
+		return false
+	}
+
+	return true
+}
+
+func (conf *Config) Validat2e() error {
 	if conf.Placement == "" {
 		return errors.New("empty location provided")
 	}
@@ -121,14 +171,6 @@ func (conf *Config) Validate() error {
 
 	if conf.IntervalSecs > 300 {
 		return fmt.Errorf("invalid interval: mut not be greater than 300 but is %d", conf.IntervalSecs)
-	}
-
-	if err := matchTopic(conf.Topic); err != nil {
-		return errors.New("invalid mqtt topic provided")
-	}
-
-	if err := matchHost(conf.MqttConfig.Host); err != nil {
-		return err
 	}
 
 	if err := conf.SensorConfig.Validate(); err != nil {

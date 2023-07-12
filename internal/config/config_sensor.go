@@ -22,9 +22,9 @@ func defaultSensorConfig() SensorConfig {
 }
 
 type SensorConfig struct {
-	FirmAtaPort          string `json:"firmata_port,omitempty"`
-	AioPin               string `json:"aio_pin,omitempty"`
-	AioPollingIntervalMs int    `json:"aio_polling_interval_ms,omitempty"`
+	FirmAtaPort          string `json:"firmata_port,omitempty" validate:"required"`
+	AioPin               string `json:"aio_pin,omitempty" validate:"required,number"`
+	AioPollingIntervalMs int    `json:"aio_polling_interval_ms,omitempty" validate:"required,min=1000,max=60000"`
 }
 
 func (conf *SensorConfig) Validate() error {
