@@ -177,7 +177,7 @@ func TestConfig_Validate(t *testing.T) {
 		{
 			name: "missing loc",
 			fields: fields{
-				MetricConfig:         ":9100",
+				MetricConfig:         "127.0.0.1:9100",
 				FirmAtaPort:          "/dev/ttyUSB0",
 				AioPin:               "5",
 				AioPollingIntervalMs: 7005,
@@ -194,7 +194,7 @@ func TestConfig_Validate(t *testing.T) {
 			name: "missing firmata",
 			fields: fields{
 				Placement:            "loc",
-				MetricConfig:         ":9100",
+				MetricConfig:         "127.0.0.1:9100",
 				AioPin:               "5",
 				AioPollingIntervalMs: 7005,
 				IntervalSecs:         30,
@@ -210,7 +210,7 @@ func TestConfig_Validate(t *testing.T) {
 			name: "missing host",
 			fields: fields{
 				Placement:            "loc",
-				MetricConfig:         ":9100",
+				MetricConfig:         "127.0.0.1:9100",
 				FirmAtaPort:          "/dev/ttyUSB0",
 				AioPin:               "5",
 				AioPollingIntervalMs: 1000,
@@ -218,6 +218,66 @@ func TestConfig_Validate(t *testing.T) {
 				LogValues:            false,
 				MqttConfig: MqttConfig{
 					Topic: "topic/bla",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "all tls client certs opts set",
+			fields: fields{
+				Placement:            "loc",
+				MetricConfig:         "127.0.0.1:9100",
+				FirmAtaPort:          "/dev/ttyUSB0",
+				AioPin:               "5",
+				AioPollingIntervalMs: 1000,
+				IntervalSecs:         30,
+				LogValues:            false,
+				MqttConfig: MqttConfig{
+					Host:           "tcp://host:1883",
+					Topic:          "topic/bla",
+					ClientKeyFile:  "/etc/passwd",
+					ClientCertFile: "/etc/passwd",
+					ServerCaFile:   "/etc/passwd",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "single tls client cert missing",
+			fields: fields{
+				Placement:            "loc",
+				MetricConfig:         "127.0.0.1:9100",
+				FirmAtaPort:          "/dev/ttyUSB0",
+				AioPin:               "5",
+				AioPollingIntervalMs: 1000,
+				IntervalSecs:         30,
+				LogValues:            false,
+				MqttConfig: MqttConfig{
+					Host:           "tcp://host:1883",
+					Topic:          "topic/bla",
+					ClientKeyFile:  "/etc/passwd",
+					ClientCertFile: "",
+					ServerCaFile:   "/etc/passwd",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "all tls client opts set but one is not a file",
+			fields: fields{
+				Placement:            "loc",
+				MetricConfig:         "127.0.0.1:9100",
+				FirmAtaPort:          "/dev/ttyUSB0",
+				AioPin:               "5",
+				AioPollingIntervalMs: 1000,
+				IntervalSecs:         30,
+				LogValues:            false,
+				MqttConfig: MqttConfig{
+					Host:           "tcp://host:1883",
+					Topic:          "topic/bla",
+					ClientKeyFile:  "imnotafileman",
+					ClientCertFile: "/etc/passwd",
+					ServerCaFile:   "/etc/passwd",
 				},
 			},
 			wantErr: true,
