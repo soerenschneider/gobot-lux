@@ -18,7 +18,7 @@ const (
 	BotName                = "gobot_lux"
 	defaultLogSensor       = false
 	defaultIntervalSeconds = 30
-	defaultMetricConfig    = ":9194"
+	defaultMetricConfig    = "0.0.0.0:9194"
 	maxStatsBucketSeconds  = 7200
 )
 
