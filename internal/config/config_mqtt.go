@@ -18,9 +18,9 @@ type MqttConfig struct {
 	Host           string `json:"mqtt_host,omitempty" validate:"required,mqtt_broker"`
 	Topic          string `json:"mqtt_topic,omitempty" validate:"required,mqtt_topic"`
 	StatsTopic     string `json:"mqtt_stats_topic,omitempty" validate:"omitempty,mqtt_topic"`
-	ClientKeyFile  string `json:"mqtt_ssl_key_file,omitempty" validate:"required_unless=ClientCertFile '',required_unless=ServerCaFile '',omitempty,file"`
-	ClientCertFile string `json:"mqtt_ssl_cert_file,omitempty" validate:"required_unless=ClientKeyFile '',required_unless=ServerCaFile '',omitempty,file"`
-	ServerCaFile   string `json:"mqtt_ssl_ca_file,omitempty" validate:"required_unless=ClientKeyFile '',required_unless=ClientCertFile '',omitempty,file"`
+	ClientKeyFile  string `json:"mqtt_ssl_key_file,omitempty" validate:"required_unless=ClientCertFile '',omitempty,file"`
+	ClientCertFile string `json:"mqtt_ssl_cert_file,omitempty" validate:"required_unless=ClientKeyFile '',omitempty,file"`
+	ServerCaFile   string `json:"mqtt_ssl_ca_file,omitempty" validate:"omitempty,file"`
 }
 
 func (conf *MqttConfig) UsesSslCerts() bool {
