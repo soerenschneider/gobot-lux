@@ -23,7 +23,7 @@ func main() {
 	conf := getConfig()
 	log.Printf("Started %s, version %s, commit %s", config.BotName, internal.BuildVersion, internal.CommitHash)
 	conf.FormatTopic()
-	conf.Print()
+	config.PrintFields(conf)
 	err := conf.Validate()
 	if err != nil {
 		log.Fatalf("Invalid config: %v", err)
@@ -76,7 +76,7 @@ func getConfig() config.Config {
 
 	if configFile == "" {
 		log.Println("Building config from env vars")
-		return config.ConfigFromEnv()
+
 	}
 
 	log.Printf("Reading config from file %s", configFile)

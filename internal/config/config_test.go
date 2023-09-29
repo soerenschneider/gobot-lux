@@ -354,6 +354,17 @@ func TestReadJsonConfig(t *testing.T) {
 	}
 }
 
+func Test_readAndValidate(t *testing.T) {
+	path := "../../contrib/real.json"
+	conf, err := ReadJsonConfig(path)
+	if err != nil {
+		t.Error(err)
+	}
+	if err := conf.Validate(); err != nil {
+		t.Error(err)
+	}
+}
+
 func Test_matchTopic(t *testing.T) {
 	tests := []struct {
 		name  string
