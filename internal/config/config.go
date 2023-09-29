@@ -31,7 +31,7 @@ type Config struct {
 	Placement     string `json:"placement,omitempty" env:"PLACEMENT" validate:"required"`
 	MetricConfig  string `json:"metrics_addr,omitempty" env:"METRICS_LISTEN_ADDR" validate:"omitempty,tcp_addr"`
 	IntervalSecs  int    `json:"interval_s,omitempty" env:"INTERVAL_S" validate:"min=1,max=300"`
-	StatIntervals []int  `json:"stat_intervals,omitempty" validate:"dive,min=10,max=3600"`
+	StatIntervals []int  `json:"stat_intervals,omitempty" env:"STAT_INTERVALS" validate:"dive,min=10,max=3600"`
 	LogSensor     bool   `json:"log_sensor,omitempty" env:"LOG_SENSOR_READINGS"`
 	MqttConfig
 	SensorConfig
