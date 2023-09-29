@@ -5,7 +5,7 @@
   "mqtt_host": "ssl://mqtt.eclipse.org:8883",
   "mqtt_ssl_cert_file": "/etc/passwd",
   "mqtt_ssl_key_file": "/etc/passwd",
-  "mqtt_stats_topic": "dd/hass/sensors/lux/corridor_stats",
+  "mqtt_stats_topic": "lux/corridor_stats",
   "mqtt_topic": "lux/corridor",
   "placement": "corridor",
   "metrics_addr": "0.0.0.0:9192"

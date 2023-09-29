@@ -25,11 +25,46 @@ $ go install github.com/soerenschneider/gobot-lux@latest
 ```
 
 ## Configuration
-gobot-lux can be fully configured using either environment variables or a config file.
 
-### Via Config File
+gobot-lux can be fully configured using either environment variables or a config file. To supply a config file, the `-config` parameter is used.
 
+### Configuration Reference
 
+| Field                  | JSON Key                | Environment Variable               | Validation Rules                                        |
+|------------------------|-------------------------|------------------------------------|---------------------------------------------------------|
+| Placement              | placement               | GOBOT_LUX_PLACEMENT                | required                                                |
+| MetricConfig           | metrics_addr            | GOBOT_LUX_METRICS_LISTEN_ADDR      | optional, must be a valid TCP address                   |
+| IntervalSecs           | interval_s              | GOBOT_LUX_INTERVAL_S               | minimum: 1, maximum: 300                                |
+| StatIntervals          | stat_intervals          | GOBOT_LUX_STAT_INTERVALS           | each value: minimum: 10, maximum: 3600                  |
+| LogSensor              | log_sensor              | GOBOT_LUX_LOG_SENSOR_READINGS      |                                                         |
+| MqttConfig             |                         |                                    |                                                         |
+| - Host                 | mqtt_host               | GOBOT_LUX_MQTT_BROKER              | required, must be a valid MQTT broker                   |
+| - Topic                | mqtt_topic              | GOBOT_LUX_MQTT_TOPIC               | required, must be a valid MQTT topic                    |
+| - StatsTopic           | mqtt_stats_topic        | GOBOT_LUX_MQTT_STATS_TOPIC         | optional, must be a valid MQTT topic                    |
+| - ClientKeyFile        | mqtt_ssl_key_file       | GOBOT_LUX_MQTT_TLS_CLIENT_KEY_FILE | required unless ClientCertFile is empty, must be a file |
+| - ClientCertFile       | mqtt_ssl_cert_file      | GOBOT_LUX_MQTT_TLS_CLIENT_CRT_FILE | required unless ClientKeyFile is empty, must be a file  |
+| - ServerCaFile         | mqtt_ssl_ca_file        | GOBOT_LUX_MQTT_TLS_SERVER_CA_FILE  | optional, must be a file                                |
+| SensorConfig           |                         |                                    |                                                         |
+| - FirmAtaPort          | firmata_port            | GOBOT_LUX_FIRMATA_PORT             | required                                                |
+| - AioPin               | aio_pin                 | GOBOT_LUX_AIO_PIN                  | required, must be a number                              |
+| - AioPollingIntervalMs | aio_polling_interval_ms | GOBOT_LUX_AIO_POLLING_MS           | required, minimum: 1000, maximum: 60000                 |
+
+### Example Config
+
+```json
+{
+  "aio_pin": "0",
+  "aio_polling_interval_ms": 1000,
+  "interval_s": 1,
+  "mqtt_host": "ssl://mqtt.eclipse.org:8883",
+  "mqtt_ssl_cert_file": "/etc/passwd",
+  "mqtt_ssl_key_file": "/etc/passwd",
+  "mqtt_stats_topic": "lux/corridor_stats",
+  "mqtt_topic": "lux/corridor",
+  "placement": "corridor",
+  "metrics_addr": "0.0.0.0:9192"
+}
+```
 
 ## Metrics
 This project exposes the following metrics in Open Metrics format under the prefix `gobot_lux`
