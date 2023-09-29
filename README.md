@@ -4,7 +4,7 @@
 ![release-workflow](https://github.com/soerenschneider/gobot-lux/actions/workflows/release.yaml/badge.svg)
 ![golangci-lint-workflow](https://github.com/soerenschneider/gobot-lux/actions/workflows/golangci-lint.yaml/badge.svg)
 
-Detects and forwards brightness data using an analogous brightness sensor and a Raspberry PI
+Reads and forwards brightness data using an analogous brightness sensor and a Raspberry PI
 
 ## Features
 
