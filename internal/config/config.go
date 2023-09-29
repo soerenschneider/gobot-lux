@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
 	"sync"
 
 	"github.com/caarlos0/env/v9"
@@ -61,7 +62,10 @@ func Read(filePath string) (*Config, error) {
 		return nil, err
 	}
 
-	err = env.Parse(&ret)
+	opts := env.Options{
+		Prefix: fmt.Sprintf("%s_", strings.ToUpper(BotName)),
+	}
+	err = env.ParseWithOptions(&ret, opts)
 	return &ret, err
 }
 
