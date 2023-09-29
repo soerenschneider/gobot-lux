@@ -49,5 +49,5 @@ This project exposes the following metrics in Open Metrics format under the pref
 | slice_entries_total          | GaugeVec     | The amount of entries in the stats slice                         | placement           |
 
 
-## CHANGELOG
-The changelog can be found [here](CHANGELOG.md)
+## Changelog
+The full changelog can be found [here](CHANGELOG.md)
