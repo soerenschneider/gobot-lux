@@ -50,7 +50,7 @@ func TestSensorConfig_Validate(t *testing.T) {
 				AioPin:               tt.fields.AioPin,
 				AioPollingIntervalMs: tt.fields.AioPollingIntervalMs,
 			}
-			if err := conf.Validate(); (err != nil) != tt.wantErr {
+			if err := Validate(conf); (err != nil) != tt.wantErr {
 				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

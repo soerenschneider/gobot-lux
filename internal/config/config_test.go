@@ -2,63 +2,9 @@ package config
 
 import (
 	"fmt"
-	"os"
 	"reflect"
-	"strings"
 	"testing"
 )
-
-func Test_fromEnvBool1(t *testing.T) {
-	key := "asdjnasdogsagsadgjsdgsdgasdgjsdg"
-	resultingKey := fmt.Sprintf("%s_%s", strings.ToUpper(BotName), strings.ToUpper(key))
-	os.Setenv(resultingKey, "true")
-	type args struct {
-		name string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    bool
-		wantErr bool
-	}{
-		{
-			name: "default",
-			args: args{
-				name: "asdjfasdighasgasdgasdg",
-			},
-			want:    false,
-			wantErr: true,
-		},
-		{
-			name: "default",
-			args: args{
-				name: "asdjfasdighasgasdgasdg",
-			},
-			want:    false,
-			wantErr: true,
-		},
-		{
-			name: "test",
-			args: args{
-				name: key,
-			},
-			want:    true,
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := fromEnvBool(tt.args.name)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("fromEnvBool() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("fromEnvBool() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
 func Test_matchHost(t *testing.T) {
 	tests := []struct {
@@ -101,41 +47,6 @@ func Test_matchHost(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := matchHost(tt.host); (got) != tt.want {
 				t.Errorf("matchHost() error = %v, wantErr %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_fromEnvInt(t *testing.T) {
-	key := "akjsdfjasgasdkg"
-	resultingKey := fmt.Sprintf("%s_%s", strings.ToUpper(BotName), strings.ToUpper(key))
-	os.Setenv(resultingKey, "3141")
-
-	tests := []struct {
-		name    string
-		want    int
-		wantErr bool
-	}{
-		{
-			name:    key,
-			want:    3141,
-			wantErr: false,
-		},
-		{
-			name:    "bla",
-			want:    -1,
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := fromEnvInt(tt.name)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("fromEnvInt() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("fromEnvInt() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -297,7 +208,7 @@ func TestConfig_Validate(t *testing.T) {
 				LogSensor:    tt.fields.LogValues,
 				MqttConfig:   tt.fields.MqttConfig,
 			}
-			if err := c.Validate(); (err != nil) != tt.wantErr {
+			if err := Validate(c); (err != nil) != tt.wantErr {
 				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -342,15 +253,27 @@ func TestReadJsonConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ReadJsonConfig(tt.filePath)
+			got, err := Read(tt.filePath)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ReadJsonConfig() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Read() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ReadJsonConfig() got = %v, want %v", got, tt.want)
+				t.Errorf("Read() got = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func Test_readAndValidate(t *testing.T) {
+	path := "../../contrib/real.json"
+	conf, err := Read(path)
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(conf)
+	if err := Validate(conf); err != nil {
+		t.Error(err)
 	}
 }
 
@@ -561,7 +484,7 @@ func TestConfig_Validate1(t *testing.T) {
 				MqttConfig:    tt.fields.MqttConfig,
 				SensorConfig:  tt.fields.SensorConfig,
 			}
-			if err := conf.Validate(); (err != nil) != tt.wantErr {
+			if err := Validate(conf); (err != nil) != tt.wantErr {
 				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

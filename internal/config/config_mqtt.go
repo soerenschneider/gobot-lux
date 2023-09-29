@@ -15,12 +15,12 @@ var (
 )
 
 type MqttConfig struct {
-	Host           string `json:"mqtt_host,omitempty" validate:"required,mqtt_broker"`
-	Topic          string `json:"mqtt_topic,omitempty" validate:"required,mqtt_topic"`
-	StatsTopic     string `json:"mqtt_stats_topic,omitempty" validate:"omitempty,mqtt_topic"`
-	ClientKeyFile  string `json:"mqtt_ssl_key_file,omitempty" validate:"required_unless=ClientCertFile '',omitempty,file"`
-	ClientCertFile string `json:"mqtt_ssl_cert_file,omitempty" validate:"required_unless=ClientKeyFile '',omitempty,file"`
-	ServerCaFile   string `json:"mqtt_ssl_ca_file,omitempty" validate:"omitempty,file"`
+	Host           string `json:"mqtt_host,omitempty" env:"MQTT_BROKER" validate:"required,mqtt_broker"`
+	Topic          string `json:"mqtt_topic,omitempty" env:"MQTT_TOPIC" validate:"required,mqtt_topic"`
+	StatsTopic     string `json:"mqtt_stats_topic,omitempty" env:"MQTT_STATS_TOPIC" validate:"omitempty,mqtt_topic"`
+	ClientKeyFile  string `json:"mqtt_ssl_key_file,omitempty" env:"MQTT_TLS_CLIENT_KEY_FILE" validate:"required_unless=ClientCertFile '',omitempty,file"`
+	ClientCertFile string `json:"mqtt_ssl_cert_file,omitempty" env:"MQTT_TLS_CLIENT_CRT_FILE" validate:"required_unless=ClientKeyFile '',omitempty,file"`
+	ServerCaFile   string `json:"mqtt_ssl_ca_file,omitempty" env:"MQTT_TLS_SERVER_CA_FILE" validate:"omitempty,file"`
 }
 
 func (conf *MqttConfig) UsesSslCerts() bool {
