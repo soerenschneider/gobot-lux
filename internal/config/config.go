@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"sync"
 
+	"github.com/caarlos0/env/v9"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -53,6 +54,11 @@ func Read(filePath string) (*Config, error) {
 
 	ret := DefaultConfig()
 	err = json.Unmarshal(fileContent, &ret)
+	if err != nil {
+		return nil, err
+	}
+
+	err = env.Parse(ret)
 	return &ret, err
 }
 
