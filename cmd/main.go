@@ -80,7 +80,7 @@ func getConfig() config.Config {
 	}
 
 	log.Printf("Reading config from file %s", configFile)
-	conf, err := config.ReadJsonConfig(configFile)
+	conf, err := config.Read(configFile)
 	if err != nil {
 		log.Fatalf("Could not read config from %s: %v", configFile, err)
 	}

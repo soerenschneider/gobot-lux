@@ -45,7 +45,7 @@ func DefaultConfig() Config {
 	}
 }
 
-func ReadJsonConfig(filePath string) (*Config, error) {
+func Read(filePath string) (*Config, error) {
 	fileContent, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("could not read config from file: %v", err)

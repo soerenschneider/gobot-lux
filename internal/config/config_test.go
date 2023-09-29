@@ -342,13 +342,13 @@ func TestReadJsonConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ReadJsonConfig(tt.filePath)
+			got, err := Read(tt.filePath)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ReadJsonConfig() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Read() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ReadJsonConfig() got = %v, want %v", got, tt.want)
+				t.Errorf("Read() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -356,7 +356,7 @@ func TestReadJsonConfig(t *testing.T) {
 
 func Test_readAndValidate(t *testing.T) {
 	path := "../../contrib/real.json"
-	conf, err := ReadJsonConfig(path)
+	conf, err := Read(path)
 	if err != nil {
 		t.Error(err)
 	}
