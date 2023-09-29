@@ -58,7 +58,7 @@ func Read(filePath string) (*Config, error) {
 		return nil, err
 	}
 
-	err = env.Parse(ret)
+	err = env.Parse(&ret)
 	return &ret, err
 }
 

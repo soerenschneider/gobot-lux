@@ -2,11 +2,11 @@
   "aio_pin": "0",
   "aio_polling_interval_ms": 1000,
   "interval_s": 1,
-  "mqtt_host": "ssl://mqtt.dd.soeren.cloud:8883",
-  "mqtt_ssl_cert_file": "/etc/machine-sensors-corridor.dd.soeren.cloud.crt",
-  "mqtt_ssl_key_file": "/etc/machine-sensors-corridor.dd.soeren.cloud.key",
+  "mqtt_host": "ssl://mqtt.eclipse.org:8883",
+  "mqtt_ssl_cert_file": "/etc/passwd",
+  "mqtt_ssl_key_file": "/etc/passwd",
   "mqtt_stats_topic": "dd/hass/sensors/lux/corridor_stats",
-  "mqtt_topic": "dd/hass/sensors/lux/corridor",
+  "mqtt_topic": "lux/corridor",
   "placement": "corridor",
   "metrics_addr": "0.0.0.0:9192"
 }
