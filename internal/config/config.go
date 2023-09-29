@@ -37,11 +37,14 @@ type Config struct {
 }
 
 func DefaultConfig() Config {
+	statInterval := make([]int, len(defaultStatsBucketsSeconds))
+	copy(statInterval, defaultStatsBucketsSeconds)
+
 	return Config{
 		LogSensor:     defaultLogSensor,
 		IntervalSecs:  defaultIntervalSeconds,
 		MetricConfig:  defaultMetricConfig,
-		StatIntervals: defaultStatsBucketsSeconds,
+		StatIntervals: statInterval,
 		SensorConfig:  defaultSensorConfig(),
 	}
 }

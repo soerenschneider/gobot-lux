@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -270,6 +271,7 @@ func Test_readAndValidate(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	fmt.Println(conf)
 	if err := Validate(conf); err != nil {
 		t.Error(err)
 	}
