@@ -24,7 +24,7 @@ func main() {
 	log.Printf("Started %s, version %s, commit %s", config.BotName, internal.BuildVersion, internal.CommitHash)
 	conf.FormatTopic()
 	config.PrintFields(conf)
-	err := conf.Validate()
+	err := config.Validate(conf)
 	if err != nil {
 		log.Fatalf("Invalid config: %v", err)
 	}

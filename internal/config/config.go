@@ -62,7 +62,7 @@ func Read(filePath string) (*Config, error) {
 	return &ret, err
 }
 
-func (conf *Config) Validate() error {
+func Validate(s interface{}) error {
 	once.Do(func() {
 		validate = validator.New()
 		if err := validate.RegisterValidation("mqtt_topic", validateTopic); err != nil {
@@ -72,7 +72,7 @@ func (conf *Config) Validate() error {
 			log.Fatal("could not build custom validation 'validateBroker'")
 		}
 	})
-	return validate.Struct(conf)
+	return validate.Struct(s)
 }
 
 func validateTopic(fl validator.FieldLevel) bool {
