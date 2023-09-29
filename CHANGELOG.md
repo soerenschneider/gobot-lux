@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.8.0](https://github.com/soerenschneider/gobot-lux/compare/v1.7.1...v1.8.0) (2023-07-14)
+
+
+### Features
+
+* send sensor reading instantly if exceeds deviation threshold ([752194a](https://github.com/soerenschneider/gobot-lux/commit/752194ad8259a9eb92f2c486002e8e47a21369d0))
+
+
+### Bug Fixes
+
+* fix potential race condition ([9b48682](https://github.com/soerenschneider/gobot-lux/commit/9b48682ab2798cc943d00b04d92fd60110c97b2a))
+* fix struct field tags ([ba49dd6](https://github.com/soerenschneider/gobot-lux/commit/ba49dd687c33be68f7fc53ed2cc895b207f3e011))
+* fix validation for tcp client certs ([a52243f](https://github.com/soerenschneider/gobot-lux/commit/a52243f5c1709c8aaf2b1e5e12ab2fcb0187650a))
+* make server ca independent of crt and key ([26a6003](https://github.com/soerenschneider/gobot-lux/commit/26a6003f525c60eb4d94d10a5b87b31220e8c151))
+
 ## [1.7.1](https://github.com/soerenschneider/gobot-lux/compare/v1.7.0...v1.7.1) (2022-11-29)
 
 
