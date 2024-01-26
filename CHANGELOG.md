@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.8.2](https://github.com/soerenschneider/gobot-lux/compare/v1.8.1...v1.8.2) (2024-01-26)
+
+
+### Bug Fixes
+
+* **deps:** bump github.com/go-playground/validator/v10 ([#50](https://github.com/soerenschneider/gobot-lux/issues/50)) ([c38faea](https://github.com/soerenschneider/gobot-lux/commit/c38faea79390a92c753bc8dc3944ab355baf2337))
+* **deps:** bump github.com/prometheus/client_golang ([#48](https://github.com/soerenschneider/gobot-lux/issues/48)) ([ed16c9f](https://github.com/soerenschneider/gobot-lux/commit/ed16c9f1c2dcfc508553b0864931d50ef338ac7a))
+* **deps:** bump gobot.io/x/gobot/v2 from 2.1.1 to 2.3.0 ([#49](https://github.com/soerenschneider/gobot-lux/issues/49)) ([0d38b11](https://github.com/soerenschneider/gobot-lux/commit/0d38b11045c3939fdd855fd295b4c8e65e40b480))
+* fix potential data race ([1eb64eb](https://github.com/soerenschneider/gobot-lux/commit/1eb64ebc121be9af0d8908c2e956c995b3afe6a8))
+
 ## [1.8.1](https://github.com/soerenschneider/gobot-lux/compare/v1.8.0...v1.8.1) (2024-01-26)
 
 
