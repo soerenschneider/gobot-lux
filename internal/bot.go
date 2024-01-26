@@ -125,6 +125,8 @@ func (bot *BrightnessBot) updateValue() {
 }
 
 func (bot *BrightnessBot) sendStats() {
+	bot.mutex.RLock()
+	defer bot.mutex.RUnlock()
 	max, _ := bot.Config.GetStatIntervalMax()
 	statsDict := map[string]IntervalStatistics{}
 	for _, stat := range bot.Config.StatIntervals {
