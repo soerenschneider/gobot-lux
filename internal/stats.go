@@ -91,8 +91,6 @@ func evalInterval(array []Measurement, fromIndex int) (IntervalStatistics, error
 }
 
 func (s *SensorStats) getIndexOfStatsNewerThan(timestamp time.Time) int {
-	s.m.RLock()
-	defer s.m.RUnlock()
 	for index, event := range s.stats {
 		if event.timestamp.After(timestamp) {
 			return index
